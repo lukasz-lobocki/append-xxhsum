@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/cespare/xxhash/v2"
@@ -175,6 +176,10 @@ func CalculateXXHash(filePath string) (uint64, error) {
 	return hash.Sum64(), nil
 }
 
+func Uint64ToHex(value uint64) string {
+	return strconv.FormatUint(value, 16)
+}
+
 func init() {
 	log.SetPrefix(filepath.Base(os.Args[0] + `: `))
 	log.SetFlags(0)
@@ -235,6 +240,7 @@ func main() {
 		return
 	} else {
 		fmt.Printf("XXHash Checksum: %d\n", checksum)
+		fmt.Printf("XXHash Checksum hex: %s\n", Uint64ToHex(checksum))
 	}
 
 	dict = nil
