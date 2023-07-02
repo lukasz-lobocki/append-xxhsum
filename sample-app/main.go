@@ -12,7 +12,7 @@ import (
 )
 
 const usage = `
-Usage: %s [--xxhsum-filepath=FILEPATH] [--verbose] [--help] PATH
+Usage: %s [--xxhsum-filepath FILEPATH] [--verbose] [--help] PATH
 
 Recursively adds missing xxhsum hashes from PATH to --xxhsum-filepath.
 
@@ -78,6 +78,8 @@ func main() {
 	if verbose {
 		dump_xxhsum_dict(dict)
 	}
+
+	search_dir(given_path)
 
 	dict = nil
 	if DEBUG {
@@ -172,8 +174,8 @@ func load_xxhsum_file(in_file string) map[string]string {
 		line := scanner.Text()
 		parts := strings.Split(line, "  ")
 		if len(parts) == 2 {
-			key := strings.TrimSpace(parts[0])
-			value := strings.TrimSpace(parts[1])
+			key := strings.TrimSpace(parts[1])
+			value := strings.TrimSpace(parts[0])
 			data[key] = value
 		}
 	}
@@ -190,6 +192,33 @@ func load_xxhsum_file(in_file string) map[string]string {
 func dump_xxhsum_dict(in_data map[string]string) {
 	// Print the dictionary contents
 	for key, value := range in_data {
-		fmt.Printf("Key: %s, Val: %s\n", key, value)
+		fmt.Printf("DUMP: %s {%s}\n", key, value)
+	}
+}
+
+func search_dir(dir string) {
+	// Specify the root directory
+	root := dir
+
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			fmt.Printf("Error accessing path %s: %v\n", path, err)
+			return nil
+		}
+
+		if info.IsDir() {
+			// Skip directories
+			return nil
+		}
+
+		// Print the file path
+		fmt.Printf("SEARCH: %s\n", path)
+
+		return nil
+	})
+
+	if err != nil {
+		fmt.Printf("Error walking the path %s: %v\n", root, err)
+		return
 	}
 }
