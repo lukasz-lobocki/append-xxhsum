@@ -63,10 +63,12 @@ func main() {
 	xxhsum_filepath = param_parse(xxhsum_filepath, verbose)
 
 	if verbose {
-		log.Printf("given_path=%v; parent_dir=%v; xxhsum-path=%v\n", given_path, parent_dir, xxhsum_filepath)
+		log.Printf("DEBUG given_path=%v\n", given_path)
+		log.Printf("DEBUG parent_dir=%v\n", parent_dir)
+		log.Printf("DEBUG xxhsum-path=%v\n", xxhsum_filepath)
 	}
 
-	rel2, _ := filepath.Rel(parent_dir, "/home/lukasz/Documents/aabbaa/fajle.txt")
+	rel2, _ := filepath.Rel(filepath.Dir(xxhsum_filepath), "/home/lukasz/Documents/aabbaa/fajle.txt")
 	fmt.Printf("rel_parent_fajle: %s\n", `./`+rel2)
 }
 
