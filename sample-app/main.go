@@ -192,17 +192,14 @@ func load_xxhsum_file(in_file string) map[string]string {
 func dump_xxhsum_dict(in_data map[string]string) {
 	// Print the dictionary contents
 	for key, value := range in_data {
-		fmt.Printf("DUMP: %s {%s}\n", key, value)
+		log.Printf("DUMP %s {%s}\n", key, value)
 	}
 }
 
-func search_dir(dir string) {
-	// Specify the root directory
-	root := dir
-
+func search_dir(root string) {
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			fmt.Printf("Error accessing path %s: %v\n", path, err)
+			log.Fatalf("Error accessing path %s: %v\n", path, err)
 			return nil
 		}
 
@@ -212,13 +209,13 @@ func search_dir(dir string) {
 		}
 
 		// Print the file path
-		fmt.Printf("SEARCH: %s\n", path)
+		log.Printf("SEARCH %s\n", path)
 
 		return nil
 	})
 
 	if err != nil {
-		fmt.Printf("Error walking the path %s: %v\n", root, err)
+		log.Fatalf("Error walking the path %s: %v\n", root, err)
 		return
 	}
 }
