@@ -5,10 +5,13 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/cespare/xxhash/v2"
 )
 
 const usage = `
@@ -25,70 +28,6 @@ Parameters:
 -v, --verbose                 increase the verbosity of the bash script.
 -h, --help                    show this help message and exit.
 `
-
-func init() {
-	log.SetPrefix(filepath.Base(os.Args[0] + `: `))
-	log.SetFlags(0)
-	flag.Usage = func() { fmt.Printf(usage, filepath.Base(os.Args[0])) }
-}
-
-func main() {
-
-	const DEBUG = true
-
-	var (
-		verbose         bool
-		xxhsum_filepath string
-		given_path      string
-		parent_dir      string
-		dict            map[string]string
-	)
-
-	flag.BoolVar(&verbose, "verbose", false, "increase the verbosity.")
-	flag.BoolVar(&verbose, "v", false, "increase the verbosity.")
-	flag.StringVar(&xxhsum_filepath, "xxhsum-filepath", "", "FILEPATH to file to append to.")
-	flag.StringVar(&xxhsum_filepath, "x", "", "FILEPATH to file to append to.")
-
-	flag.Parse()
-
-	// Diagnosing argument for given_path
-	if flag.NArg() != 1 {
-		log.Fatalf("PATH agrument missing.\n")
-	}
-	given_path = agr_parse(flag.Arg(0), verbose)
-	parent_dir = filepath.Dir(given_path)
-
-	//Diagnosing parameter xxhsum-filepath
-	if xxhsum_filepath == "" {
-		xxhsum_filepath = given_path + ".xxhsum"
-		if verbose {
-			log.Printf("--xxhsum-filepath defaulted to %s\n", xxhsum_filepath)
-		}
-	}
-	xxhsum_filepath = param_parse(xxhsum_filepath, verbose)
-
-	if DEBUG {
-		log.Printf("DEBUG given_path=%v\n", given_path)
-		log.Printf("DEBUG parent_dir=%v\n", parent_dir)
-		log.Printf("DEBUG xxhsum-path=%v\n", xxhsum_filepath)
-	}
-
-	dict = load_xxhsum_file(xxhsum_filepath)
-
-	if verbose {
-		dump_xxhsum_dict(dict)
-	}
-
-	search_dir(given_path)
-
-	dict = nil
-	if DEBUG {
-		log.Fatalln("DUPA")
-	}
-
-	rel2, _ := filepath.Rel(filepath.Dir(xxhsum_filepath), "/home/lukasz/Documents/aabbaa/fajle.txt")
-	fmt.Printf("rel_parent_fajle: %s\n", `./`+rel2)
-}
 
 func agr_parse(arg string, verbose bool) string {
 
@@ -218,4 +157,91 @@ func search_dir(root string) {
 		log.Fatalf("Error walking the path %s: %v\n", root, err)
 		return
 	}
+}
+
+func CalculateXXHash(filePath string) (uint64, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return 0, err
+	}
+	defer file.Close()
+
+	hash := xxhash.New()
+
+	if _, err := io.Copy(hash, file); err != nil {
+		return 0, err
+	}
+
+	return hash.Sum64(), nil
+}
+
+func init() {
+	log.SetPrefix(filepath.Base(os.Args[0] + `: `))
+	log.SetFlags(0)
+	flag.Usage = func() { fmt.Printf(usage, filepath.Base(os.Args[0])) }
+}
+
+func main() {
+
+	const DEBUG = true
+
+	var (
+		verbose         bool
+		xxhsum_filepath string
+		given_path      string
+		parent_dir      string
+		dict            map[string]string
+	)
+
+	flag.BoolVar(&verbose, "verbose", false, "increase the verbosity.")
+	flag.BoolVar(&verbose, "v", false, "increase the verbosity.")
+	flag.StringVar(&xxhsum_filepath, "xxhsum-filepath", "", "FILEPATH to file to append to.")
+	flag.StringVar(&xxhsum_filepath, "x", "", "FILEPATH to file to append to.")
+
+	flag.Parse()
+
+	// Diagnosing argument for given_path
+	if flag.NArg() != 1 {
+		log.Fatalf("PATH agrument missing.\n")
+	}
+	given_path = agr_parse(flag.Arg(0), verbose)
+	parent_dir = filepath.Dir(given_path)
+
+	//Diagnosing parameter xxhsum-filepath
+	if xxhsum_filepath == "" {
+		xxhsum_filepath = given_path + ".xxhsum"
+		if verbose {
+			log.Printf("--xxhsum-filepath defaulted to %s\n", xxhsum_filepath)
+		}
+	}
+	xxhsum_filepath = param_parse(xxhsum_filepath, verbose)
+
+	if DEBUG {
+		log.Printf("DEBUG given_path=%v\n", given_path)
+		log.Printf("DEBUG parent_dir=%v\n", parent_dir)
+		log.Printf("DEBUG xxhsum-path=%v\n", xxhsum_filepath)
+	}
+
+	dict = load_xxhsum_file(xxhsum_filepath)
+
+	if verbose {
+		dump_xxhsum_dict(dict)
+	}
+
+	search_dir(given_path)
+
+	if checksum, err := CalculateXXHash("/home/lukasz/Documents/aabbaa/fajle.txt"); err != nil {
+		fmt.Printf("Error calculating xxHash: %v\n", err)
+		return
+	} else {
+		fmt.Printf("XXHash Checksum: %d\n", checksum)
+	}
+
+	dict = nil
+	if DEBUG {
+		log.Fatalln("DUPA")
+	}
+
+	rel2, _ := filepath.Rel(filepath.Dir(xxhsum_filepath), "/home/lukasz/Documents/aabbaa/fajle.txt")
+	fmt.Printf("rel_parent_fajle: %s\n", `./`+rel2)
 }
