@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"flag"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 const usage = `
@@ -37,6 +39,7 @@ func main() {
 		xxhsum_filepath string
 		given_path      string
 		parent_dir      string
+		dict            map[string]string
 	)
 
 	flag.BoolVar(&verbose, "verbose", false, "increase the verbosity.")
@@ -67,6 +70,13 @@ func main() {
 		log.Printf("DEBUG parent_dir=%v\n", parent_dir)
 		log.Printf("DEBUG xxhsum-path=%v\n", xxhsum_filepath)
 	}
+
+	dict = load_xxhsum_file(xxhsum_filepath)
+	if verbose {
+		dump_xxhsum_dict(dict)
+	}
+	dict = nil
+	log.Fatalln("DUPA")
 
 	rel2, _ := filepath.Rel(filepath.Dir(xxhsum_filepath), "/home/lukasz/Documents/aabbaa/fajle.txt")
 	fmt.Printf("rel_parent_fajle: %s\n", `./`+rel2)
@@ -130,4 +140,43 @@ func param_parse(param string, verbose bool) string {
 	}
 
 	return file_path
+}
+
+func load_xxhsum_file(in_file string) map[string]string {
+	// Open the text file
+	file, err := os.Open(in_file)
+	if err != nil {
+		log.Fatalln("Error opening file:", err)
+	}
+	defer file.Close()
+
+	// Create a dictionary (map) to store the data
+	data := make(map[string]string)
+
+	// Read the file line by line
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		parts := strings.Split(line, "  ")
+		if len(parts) == 2 {
+			key := strings.TrimSpace(parts[0])
+			value := strings.TrimSpace(parts[1])
+			data[key] = value
+		}
+	}
+
+	// Check for any scanning errors
+	if err := scanner.Err(); err != nil {
+		log.Fatalln("Error scanning file:", err)
+		return nil
+	}
+
+	return data
+}
+
+func dump_xxhsum_dict(in_data map[string]string) {
+	// Print the dictionary contents
+	for key, value := range in_data {
+		fmt.Printf("Key: %s, Val: %s\n", key, value)
+	}
 }
