@@ -136,7 +136,7 @@ func dump_xxhsum_dict(in_data map[string]string) {
 	}
 }
 
-func search_dir(root string, xxhsum_filepath string) {
+func search_dir(root string, dict map[string]string, xxhsum_filepath string) {
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			log.Printf("Error accessing path %s: %v\n", path, err)
@@ -148,16 +148,23 @@ func search_dir(root string, xxhsum_filepath string) {
 			return nil
 		}
 
-		// Print the file path
-		if checksum, err := calculateXXHash(path); err != nil {
-			log.Printf("Error calculating xxHash: %v", err)
-			return nil
+		if rel_path, err := filepath.Rel(filepath.Dir(xxhsum_filepath), path); err != nil {
+			log.Printf("Error resolving filepath: %v", err)
 		} else {
-			if rel_path, err := filepath.Rel(filepath.Dir(xxhsum_filepath), path); err != nil {
-				log.Printf("Error resolving filepath: %v", err)
-				return nil
+			rel_path = "./" + rel_path
+			if _, ok := dict[rel_path]; ok {
+				log.Printf("%s exists.\n", rel_path)
+				// return nil
 			} else {
-				fmt.Printf("%s  %s\n", checksum, "./"+rel_path)
+				if checksum, err := calculateXXHash(path); err != nil {
+					log.Printf("Error calculating xxHash: %v", err)
+				} else {
+					if rel_path, err := filepath.Rel(filepath.Dir(xxhsum_filepath), path); err != nil {
+						log.Printf("Error resolving filepath: %v", err)
+					} else {
+						fmt.Printf("%s  %s\n", checksum, "./"+rel_path)
+					}
+				}
 			}
 		}
 
@@ -239,7 +246,7 @@ func main() {
 		dump_xxhsum_dict(dict)
 	}
 
-	search_dir(given_path, xxhsum_filepath)
+	search_dir(given_path, dict, xxhsum_filepath)
 
 	dict = nil
 	if DEBUG {
