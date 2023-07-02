@@ -136,10 +136,10 @@ func dump_xxhsum_dict(in_data map[string]string) {
 	}
 }
 
-func search_dir(root string) {
+func search_dir(root string, xxhsum_filepath string) {
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			log.Fatalf("Error accessing path %s: %v\n", path, err)
+			log.Printf("Error accessing path %s: %v\n", path, err)
 			return nil
 		}
 
@@ -149,7 +149,17 @@ func search_dir(root string) {
 		}
 
 		// Print the file path
-		log.Printf("SEARCH %s\n", path)
+		if checksum, err := calculateXXHash(path); err != nil {
+			log.Printf("Error calculating xxHash: %v", err)
+			return nil
+		} else {
+			if rel_path, err := filepath.Rel(filepath.Dir(xxhsum_filepath), path); err != nil {
+				log.Printf("Error resolving filepath: %v", err)
+				return nil
+			} else {
+				fmt.Printf("%s  %s\n", checksum, "./"+rel_path)
+			}
+		}
 
 		return nil
 	})
@@ -160,24 +170,20 @@ func search_dir(root string) {
 	}
 }
 
-func CalculateXXHash(filePath string) (uint64, error) {
+func calculateXXHash(filePath string) (string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 	defer file.Close()
 
 	hash := xxhash.New()
 
 	if _, err := io.Copy(hash, file); err != nil {
-		return 0, err
+		return "", err
 	}
 
-	return hash.Sum64(), nil
-}
-
-func Uint64ToHex(value uint64) string {
-	return strconv.FormatUint(value, 16)
+	return strconv.FormatUint(hash.Sum64(), 16), nil
 }
 
 func init() {
@@ -233,21 +239,11 @@ func main() {
 		dump_xxhsum_dict(dict)
 	}
 
-	search_dir(given_path)
-
-	if checksum, err := CalculateXXHash("/home/lukasz/Documents/aabbaa/fajle.txt"); err != nil {
-		fmt.Printf("Error calculating xxHash: %v\n", err)
-		return
-	} else {
-		fmt.Printf("XXHash Checksum: %d\n", checksum)
-		fmt.Printf("XXHash Checksum hex: %s\n", Uint64ToHex(checksum))
-	}
+	search_dir(given_path, xxhsum_filepath)
 
 	dict = nil
 	if DEBUG {
 		log.Fatalln("DUPA")
 	}
 
-	rel2, _ := filepath.Rel(filepath.Dir(xxhsum_filepath), "/home/lukasz/Documents/aabbaa/fajle.txt")
-	fmt.Printf("rel_parent_fajle: %s\n", `./`+rel2)
 }
