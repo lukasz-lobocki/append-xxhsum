@@ -123,7 +123,7 @@ func param_parse(param string, verbose bool) string {
 		}
 	} else {
 		if !file_info.Mode().IsRegular() {
-			log.Fatalf("%s is not a file.\n", file_path)
+			log.Fatalf("%s exists but is not a file.\n", file_path)
 		} else if verbose {
 			log.Printf("%s is a file.\n", file_path)
 		}
