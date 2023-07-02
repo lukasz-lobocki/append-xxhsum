@@ -75,6 +75,7 @@ func main() {
 	if verbose {
 		dump_xxhsum_dict(dict)
 	}
+
 	dict = nil
 	log.Fatalln("DUPA")
 
@@ -90,14 +91,14 @@ func agr_parse(arg string, verbose bool) string {
 	)
 
 	if dir_path, err = filepath.Abs(arg); err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Error resolving filepath:", err)
 	}
 
 	if file_info, err := os.Stat(dir_path); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			log.Fatalf("%s does not exist.\n", dir_path)
 		} else {
-			log.Fatalln(err)
+			log.Fatalln("Error accessing file:", err)
 		}
 	} else {
 		if !file_info.Mode().IsDir() {
@@ -118,18 +119,18 @@ func param_parse(param string, verbose bool) string {
 	)
 
 	if file_path, err = filepath.Abs(param); err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Error resolving filepath:", err)
 	}
 
 	if file_info, err := os.Stat(file_path); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			if file, err := os.Create(file_path); err != nil {
 				defer file.Close()
-				log.Fatalln(err)
+				log.Fatalln("Error creating file:", err)
 			}
 			log.Printf("%s created.\n", file_path)
 		} else {
-			log.Fatalln(err)
+			log.Fatalln("Error accessing file:", err)
 		}
 	} else {
 		if !file_info.Mode().IsRegular() {
@@ -143,12 +144,18 @@ func param_parse(param string, verbose bool) string {
 }
 
 func load_xxhsum_file(in_file string) map[string]string {
+
+	var (
+		file *os.File
+		err  error
+	)
+
 	// Open the text file
-	file, err := os.Open(in_file)
+	file, err = os.Open(in_file)
 	if err != nil {
+		defer file.Close()
 		log.Fatalln("Error opening file:", err)
 	}
-	defer file.Close()
 
 	// Create a dictionary (map) to store the data
 	data := make(map[string]string)
