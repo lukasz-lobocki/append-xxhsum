@@ -148,6 +148,7 @@ func load_xxhsum_file(in_file string) map[string]string {
 	var (
 		file *os.File
 		err  error
+		data map[string]string
 	)
 
 	// Open the text file
@@ -158,7 +159,7 @@ func load_xxhsum_file(in_file string) map[string]string {
 	}
 
 	// Create a dictionary (map) to store the data
-	data := make(map[string]string)
+	data = make(map[string]string)
 
 	// Read the file line by line
 	scanner := bufio.NewScanner(file)
