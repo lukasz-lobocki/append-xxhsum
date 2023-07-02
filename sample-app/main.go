@@ -34,6 +34,8 @@ func init() {
 
 func main() {
 
+	const DEBUG = true
+
 	var (
 		verbose         bool
 		xxhsum_filepath string
@@ -65,19 +67,22 @@ func main() {
 	}
 	xxhsum_filepath = param_parse(xxhsum_filepath, verbose)
 
-	if verbose {
+	if DEBUG {
 		log.Printf("DEBUG given_path=%v\n", given_path)
 		log.Printf("DEBUG parent_dir=%v\n", parent_dir)
 		log.Printf("DEBUG xxhsum-path=%v\n", xxhsum_filepath)
 	}
 
 	dict = load_xxhsum_file(xxhsum_filepath)
+
 	if verbose {
 		dump_xxhsum_dict(dict)
 	}
 
 	dict = nil
-	log.Fatalln("DUPA")
+	if DEBUG {
+		log.Fatalln("DUPA")
+	}
 
 	rel2, _ := filepath.Rel(filepath.Dir(xxhsum_filepath), "/home/lukasz/Documents/aabbaa/fajle.txt")
 	fmt.Printf("rel_parent_fajle: %s\n", `./`+rel2)
