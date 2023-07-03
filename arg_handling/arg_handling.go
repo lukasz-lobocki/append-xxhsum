@@ -49,7 +49,6 @@ func Arg_parse(arg string, verbose bool) string {
 			log.Printf("%s is a directory.\n", dir_path)
 		}
 	}
-
 	return dir_path
 }
 
@@ -85,7 +84,6 @@ func Param_parse(param string, verbose bool) string {
 			log.Printf("%s is a file.\n", file_path)
 		}
 	}
-
 	return file_path
 }
 

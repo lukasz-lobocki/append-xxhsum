@@ -9,57 +9,11 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"xxhsum/arg_handling"
+	"xxhsum/dictionar"
 
 	"github.com/cespare/xxhash/v2"
 )
-
-func load_xxhsum_file(in_file string) map[string]string {
-
-	var (
-		file *os.File
-		err  error
-		data map[string]string
-	)
-
-	// Open the text file
-	file, err = os.Open(in_file)
-	if err != nil {
-		defer file.Close()
-		log.Fatalln("Error opening file:", err)
-	}
-
-	// Create a dictionary (map) to store the data
-	data = make(map[string]string)
-
-	// Read the file line by line
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		parts := strings.Split(line, "  ")
-		if len(parts) == 2 {
-			key := strings.TrimSpace(parts[1])
-			value := strings.TrimSpace(parts[0])
-			data[key] = value
-		}
-	}
-
-	// Check for any scanning errors
-	if err := scanner.Err(); err != nil {
-		log.Fatalln("Error scanning file:", err)
-		return nil
-	}
-
-	return data
-}
-
-func dump_xxhsum_dict(in_data map[string]string) {
-	// Print the dictionary contents
-	for key, value := range in_data {
-		log.Printf("DUMP %s  %s\n", value, key)
-	}
-}
 
 func search_dir(root string, dict map[string]string, xxhsum_filepath string, verbose bool) {
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
@@ -196,10 +150,10 @@ func main() {
 	/*
 		Doing the do
 	*/
-	dict = load_xxhsum_file(xxhsum_filepath)
+	dict = dictionar.Load_xxhsum_file(xxhsum_filepath)
 
 	if verbose {
-		dump_xxhsum_dict(dict)
+		dictionar.Dump_xxhsum_dict(dict)
 	}
 
 	search_dir(given_path, dict, xxhsum_filepath, verbose)
