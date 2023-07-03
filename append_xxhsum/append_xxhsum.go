@@ -15,21 +15,6 @@ import (
 	"github.com/cespare/xxhash/v2"
 )
 
-const usage = `
-Usage: %s [--xxhsum-filepath FILEPATH] [--verbose] [--help] PATH
-
-Recursively adds missing xxhsum hashes from PATH to --xxhsum-filepath.
-
-Arguments:
-PATH                          PATH to analyze. Must exist and be readable (+r) and browsable/executable (+x).
-
-Parameters:
--x, --xxhsum-filepath         FILEPATH to file to append to. Defaults to PATH\..\DIRNAME.xxhsum. Must be readable (+r)
-                              and writable (+w).
--v, --verbose                 increase the verbosity of the bash script.
--h, --help                    show this help message and exit.
-`
-
 func load_xxhsum_file(in_file string) map[string]string {
 
 	var (
@@ -132,7 +117,7 @@ func calculateXXHash(filePath string) (string, error) {
 func init() {
 	log.SetPrefix(filepath.Base(os.Args[0] + `: `))
 	log.SetFlags(0)
-	flag.Usage = func() { fmt.Printf(usage, filepath.Base(os.Args[0])) }
+	flag.Usage = func() { fmt.Printf(arg_handling.Usage, filepath.Base(os.Args[0])) }
 }
 
 func main() {
@@ -188,5 +173,4 @@ func main() {
 	if DEBUG {
 		log.Fatalln("DUPA")
 	}
-
 }
