@@ -113,6 +113,7 @@ func main() {
 		given_path      string
 		parent_path     string
 		dict            map[string]string
+		exists          bool = false
 	)
 
 	/*
@@ -139,21 +140,25 @@ func main() {
 			log.Printf("--xxhsum-filepath defaulted to %s\n", xxhsum_filepath)
 		}
 	}
-	xxhsum_filepath = arg_handling.Param_parse(xxhsum_filepath, verbose)
+
+	xxhsum_filepath, exists = arg_handling.Param_parse(xxhsum_filepath, verbose)
 
 	if DEBUG {
 		log.Printf("DEBUG given_path=%v\n", given_path)
 		log.Printf("DEBUG parent_dir=%v\n", parent_path)
 		log.Printf("DEBUG xxhsum-path=%v\n", xxhsum_filepath)
+		log.Printf("DEBUG xxhsum-path exists=%t\n", exists)
 	}
 
 	/*
 		Doing the do
 	*/
-	dict = dictionar.Load_xxhsum_file(xxhsum_filepath)
+	if exists {
+		dict = dictionar.Load_xxhsum_file(xxhsum_filepath)
 
-	if verbose {
-		dictionar.Dump_xxhsum_dict(dict)
+		if verbose {
+			dictionar.Dump_xxhsum_dict(dict)
+		}
 	}
 
 	search_dir(given_path, dict, xxhsum_filepath, verbose)

@@ -52,12 +52,13 @@ func Arg_parse(arg string, verbose bool) string {
 	return dir_path
 }
 
-func Param_parse(param string, verbose bool) string {
+func Param_parse(param string, verbose bool) (string, bool) {
 	// xxhsum-filepath
 
 	var (
 		err       error
 		file_path string
+		exists    bool
 	)
 
 	if strings.HasPrefix(param, "~") {
@@ -69,22 +70,21 @@ func Param_parse(param string, verbose bool) string {
 
 	if file_info, err := os.Stat(file_path); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			if file, err := os.Create(file_path); err != nil {
-				defer file.Close()
-				log.Fatalln("Error creating file:", err)
-			}
-			log.Printf("%s created.\n", file_path)
+			exists = false
 		} else {
 			log.Fatalln("Error accessing file:", err)
 		}
 	} else {
 		if !file_info.Mode().IsRegular() {
 			log.Fatalf("%s exists but is not a file.\n", file_path)
-		} else if verbose {
-			log.Printf("%s is a file.\n", file_path)
+		} else {
+			exists = true
+			if verbose {
+				log.Printf("%s is a file.\n", file_path)
+			}
 		}
 	}
-	return file_path
+	return file_path, exists
 }
 
 func expand_tilde(path string) string {
