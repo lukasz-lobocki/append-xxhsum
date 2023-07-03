@@ -41,9 +41,9 @@ func search_dir(root string, dict map[string]string, xxhsum_filepath string, ver
 				if checksum, err := calculateXXHash(path); err != nil {
 					log.Printf("Error calculating xxHash: %v", err)
 				} else {
-					output := fmt.Sprintf("%s  %s\n", checksum, rel_path)
-					fmt.Print(output)
-					append_to_file(xxhsum_filepath, output)
+					line := fmt.Sprintf("%s  %s\n", checksum, rel_path)
+					fmt.Print(line)
+					append_to_file(xxhsum_filepath, line)
 				}
 			}
 		}
@@ -53,7 +53,6 @@ func search_dir(root string, dict map[string]string, xxhsum_filepath string, ver
 
 	if err != nil {
 		log.Fatalf("Error walking the path %s: %v\n", root, err)
-		return
 	}
 }
 
@@ -162,10 +161,6 @@ func main() {
 	}
 
 	search_dir(given_path, dict, xxhsum_filepath, verbose)
-
-	if DEBUG {
-		log.Fatalln("DUPA")
-	}
 
 	dict = nil
 }
