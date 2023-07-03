@@ -10,9 +10,9 @@ import (
 func Load_xxhsum_file(in_file string) map[string]string {
 
 	var (
-		file *os.File
-		err  error
-		data map[string]string
+		file *os.File          = nil
+		err  error             = nil
+		data map[string]string = nil
 	)
 
 	// Open the text file

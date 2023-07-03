@@ -108,12 +108,12 @@ func main() {
 	const DEBUG = true
 
 	var (
-		verbose         bool
-		xxhsum_filepath string
-		given_path      string
-		parent_path     string
-		dict            map[string]string
-		exists          bool = false
+		verbose         bool              = false
+		xxhsum_filepath string            = ""
+		given_path      string            = ""
+		parent_path     string            = ""
+		dict            map[string]string = nil
+		exists          bool              = false
 	)
 
 	/*

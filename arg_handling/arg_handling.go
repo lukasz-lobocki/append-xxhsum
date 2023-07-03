@@ -28,8 +28,8 @@ func Arg_parse(arg string, verbose bool) string {
 	// PATH
 
 	var (
-		err      error
-		dir_path string
+		err      error  = nil
+		dir_path string = ""
 	)
 
 	if dir_path, err = filepath.Abs(arg); err != nil {
@@ -56,9 +56,9 @@ func Param_parse(param string, verbose bool) (string, bool) {
 	// xxhsum-filepath
 
 	var (
-		err       error
-		file_path string
-		exists    bool
+		err       error  = nil
+		file_path string = ""
+		exists    bool   = false
 	)
 
 	if strings.HasPrefix(param, "~") {
@@ -69,9 +69,7 @@ func Param_parse(param string, verbose bool) (string, bool) {
 	}
 
 	if file_info, err := os.Stat(file_path); err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			exists = false
-		} else {
+		if !errors.Is(err, os.ErrNotExist) {
 			log.Fatalln("Error accessing file:", err)
 		}
 	} else {
