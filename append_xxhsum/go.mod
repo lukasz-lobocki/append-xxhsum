@@ -1,4 +1,4 @@
-module sample-app
+module xxhsum/append_xxhsum
 
 go 1.20
 

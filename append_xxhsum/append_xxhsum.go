@@ -159,11 +159,7 @@ func search_dir(root string, dict map[string]string, xxhsum_filepath string) {
 				if checksum, err := calculateXXHash(path); err != nil {
 					log.Printf("Error calculating xxHash: %v", err)
 				} else {
-					if rel_path, err := filepath.Rel(filepath.Dir(xxhsum_filepath), path); err != nil {
-						log.Printf("Error resolving filepath: %v", err)
-					} else {
-						fmt.Printf("%s  %s\n", checksum, "./"+rel_path)
-					}
+					fmt.Printf("%s  %s\n", checksum, rel_path)
 				}
 			}
 		}
