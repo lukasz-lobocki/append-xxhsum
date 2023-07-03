@@ -57,11 +57,11 @@ func load_xxhsum_file(in_file string) map[string]string {
 func dump_xxhsum_dict(in_data map[string]string) {
 	// Print the dictionary contents
 	for key, value := range in_data {
-		log.Printf("DUMP %s {%s}\n", key, value)
+		log.Printf("DUMP %s  %s\n", value, key)
 	}
 }
 
-func search_dir(root string, dict map[string]string, xxhsum_filepath string) {
+func search_dir(root string, dict map[string]string, xxhsum_filepath string, verbose bool) {
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			log.Printf("Error accessing path %s: %v\n", path, err)
@@ -77,14 +77,19 @@ func search_dir(root string, dict map[string]string, xxhsum_filepath string) {
 			log.Printf("Error resolving filepath: %v", err)
 		} else {
 			rel_path = "./" + rel_path
+
 			if _, ok := dict[rel_path]; ok {
-				log.Printf("%s exists.\n", rel_path)
-				// return nil
+				if verbose {
+					log.Printf("%s exists.\n", rel_path)
+				}
+				return nil
 			} else {
 				if checksum, err := calculateXXHash(path); err != nil {
 					log.Printf("Error calculating xxHash: %v", err)
 				} else {
-					fmt.Printf("%s  %s\n", checksum, rel_path)
+					output := fmt.Sprintf("%s  %s\n", checksum, rel_path)
+					fmt.Print(output)
+					append_to_file(xxhsum_filepath, output)
 				}
 			}
 		}
@@ -112,6 +117,30 @@ func calculateXXHash(filePath string) (string, error) {
 	}
 
 	return strconv.FormatUint(hash.Sum64(), 16), nil
+}
+
+func append_to_file(filename string, content string) {
+	// Open the file in append mode, create it if it doesn't exist
+	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	// Create a buffered writer for efficient writing
+	writer := bufio.NewWriter(file)
+
+	// Write the content to the file
+	_, err = writer.WriteString(content)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Flush the buffer to ensure the content is written
+	err = writer.Flush()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func init() {
@@ -161,18 +190,17 @@ func main() {
 		log.Printf("DEBUG xxhsum-path=%v\n", xxhsum_filepath)
 	}
 
-	if DEBUG {
-		log.Fatalln("DUPA")
-	}
-
 	dict = load_xxhsum_file(xxhsum_filepath)
 
 	if verbose {
 		dump_xxhsum_dict(dict)
 	}
 
-	search_dir(given_path, dict, xxhsum_filepath)
+	search_dir(given_path, dict, xxhsum_filepath, verbose)
+
+	if DEBUG {
+		log.Fatalln("DUPA")
+	}
 
 	dict = nil
-
 }
