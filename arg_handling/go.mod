@@ -1,3 +1,3 @@
-module xxhsum/arg_handling
+module xxhsum/arg_handing
 
 go 1.20

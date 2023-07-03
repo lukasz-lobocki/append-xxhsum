@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -11,6 +10,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"xxhsum/arg_handling"
 
 	"github.com/cespare/xxhash/v2"
 )
@@ -29,66 +29,6 @@ Parameters:
 -v, --verbose                 increase the verbosity of the bash script.
 -h, --help                    show this help message and exit.
 `
-
-func agr_parse(arg string, verbose bool) string {
-
-	var (
-		err      error
-		dir_path string
-	)
-
-	if dir_path, err = filepath.Abs(arg); err != nil {
-		log.Fatalln("Error resolving filepath:", err)
-	}
-
-	if file_info, err := os.Stat(dir_path); err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			log.Fatalf("%s does not exist.\n", dir_path)
-		} else {
-			log.Fatalln("Error accessing file:", err)
-		}
-	} else {
-		if !file_info.Mode().IsDir() {
-			log.Fatalf("%s exists but is not a directory.\n", dir_path)
-		} else if verbose {
-			log.Printf("%s is a directory.\n", dir_path)
-		}
-	}
-
-	return dir_path
-}
-
-func param_parse(param string, verbose bool) string {
-
-	var (
-		err       error
-		file_path string
-	)
-
-	if file_path, err = filepath.Abs(param); err != nil {
-		log.Fatalln("Error resolving filepath:", err)
-	}
-
-	if file_info, err := os.Stat(file_path); err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			if file, err := os.Create(file_path); err != nil {
-				defer file.Close()
-				log.Fatalln("Error creating file:", err)
-			}
-			log.Printf("%s created.\n", file_path)
-		} else {
-			log.Fatalln("Error accessing file:", err)
-		}
-	} else {
-		if !file_info.Mode().IsRegular() {
-			log.Fatalf("%s exists but is not a file.\n", file_path)
-		} else if verbose {
-			log.Printf("%s is a file.\n", file_path)
-		}
-	}
-
-	return file_path
-}
 
 func load_xxhsum_file(in_file string) map[string]string {
 
@@ -218,7 +158,7 @@ func main() {
 	if flag.NArg() != 1 {
 		log.Fatalf("PATH agrument missing.\n")
 	}
-	given_path = agr_parse(flag.Arg(0), verbose)
+	given_path = arg_handling.Arg_parse(flag.Arg(0), verbose)
 	parent_dir = filepath.Dir(given_path)
 
 	//Diagnosing parameter xxhsum-filepath
@@ -228,7 +168,7 @@ func main() {
 			log.Printf("--xxhsum-filepath defaulted to %s\n", xxhsum_filepath)
 		}
 	}
-	xxhsum_filepath = param_parse(xxhsum_filepath, verbose)
+	xxhsum_filepath = arg_handling.Param_parse(xxhsum_filepath, verbose)
 
 	if DEBUG {
 		log.Printf("DEBUG given_path=%v\n", given_path)

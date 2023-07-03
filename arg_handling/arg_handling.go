@@ -1,19 +1,13 @@
 package arg_handling
 
 import (
-	"bufio"
 	"errors"
-	"flag"
-	"fmt"
-	"io"
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
-	"strings"
 )
 
-const usage = `
+const Usage = `
 Usage: %s [--xxhsum-filepath FILEPATH] [--verbose] [--help] PATH
 
 Recursively adds missing xxhsum hashes from PATH to --xxhsum-filepath.
@@ -28,7 +22,7 @@ Parameters:
 -h, --help                    show this help message and exit.
 `
 
-func agr_parse(arg string, verbose bool) string {
+func Arg_parse(arg string, verbose bool) string {
 
 	var (
 		err      error
@@ -56,7 +50,7 @@ func agr_parse(arg string, verbose bool) string {
 	return dir_path
 }
 
-func param_parse(param string, verbose bool) string {
+func Param_parse(param string, verbose bool) string {
 
 	var (
 		err       error
