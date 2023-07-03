@@ -4,7 +4,9 @@ import (
 	"errors"
 	"log"
 	"os"
+	"os/user"
 	"path/filepath"
+	"strings"
 )
 
 const Usage = `
@@ -23,6 +25,7 @@ Parameters:
 `
 
 func Arg_parse(arg string, verbose bool) string {
+	// PATH
 
 	var (
 		err      error
@@ -51,12 +54,16 @@ func Arg_parse(arg string, verbose bool) string {
 }
 
 func Param_parse(param string, verbose bool) string {
+	// xxhsum-filepath
 
 	var (
 		err       error
 		file_path string
 	)
 
+	if strings.HasPrefix(param, "~/") {
+		param = expand_tilde(param)
+	}
 	if file_path, err = filepath.Abs(param); err != nil {
 		log.Fatalln("Error resolving filepath:", err)
 	}
@@ -80,4 +87,24 @@ func Param_parse(param string, verbose bool) string {
 	}
 
 	return file_path
+}
+
+func expand_tilde(path string) string {
+	if usr, err := user.Current(); err != nil {
+		log.Fatalln("No current user:", err)
+	} else {
+		if dir, err := filepath.Abs(usr.HomeDir); err != nil {
+			log.Fatalln("No homedir:", err)
+		} else {
+			if path == "~" {
+				// In case of "~", which won't be caught by the "else if"
+				path = dir
+			} else if strings.HasPrefix(path, "~/") {
+				// Use strings.HasPrefix so we don't match paths like
+				// "/something/~/something/"
+				path = filepath.Join(dir, path[2:])
+			}
+		}
+	}
+	return path
 }

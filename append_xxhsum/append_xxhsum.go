@@ -128,7 +128,7 @@ func main() {
 		verbose         bool
 		xxhsum_filepath string
 		given_path      string
-		parent_dir      string
+		parent_path     string
 		dict            map[string]string
 	)
 
@@ -139,14 +139,14 @@ func main() {
 
 	flag.Parse()
 
-	// Diagnosing argument for given_path
+	// Parsing argument for given_path
 	if flag.NArg() != 1 {
 		log.Fatalf("PATH agrument missing.\n")
 	}
 	given_path = arg_handling.Arg_parse(flag.Arg(0), verbose)
-	parent_dir = filepath.Dir(given_path)
+	parent_path = filepath.Dir(given_path)
 
-	//Diagnosing parameter xxhsum-filepath
+	// Parsing parameter xxhsum-filepath
 	if xxhsum_filepath == "" {
 		xxhsum_filepath = given_path + ".xxhsum"
 		if verbose {
@@ -157,8 +157,12 @@ func main() {
 
 	if DEBUG {
 		log.Printf("DEBUG given_path=%v\n", given_path)
-		log.Printf("DEBUG parent_dir=%v\n", parent_dir)
+		log.Printf("DEBUG parent_dir=%v\n", parent_path)
 		log.Printf("DEBUG xxhsum-path=%v\n", xxhsum_filepath)
+	}
+
+	if DEBUG {
+		log.Fatalln("DUPA")
 	}
 
 	dict = load_xxhsum_file(xxhsum_filepath)
@@ -170,7 +174,5 @@ func main() {
 	search_dir(given_path, dict, xxhsum_filepath)
 
 	dict = nil
-	if DEBUG {
-		log.Fatalln("DUPA")
-	}
+
 }
