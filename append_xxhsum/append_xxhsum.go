@@ -161,6 +161,9 @@ func main() {
 		dict            map[string]string
 	)
 
+	/*
+		Parsing input
+	*/
 	flag.BoolVar(&verbose, "verbose", false, "increase the verbosity.")
 	flag.BoolVar(&verbose, "v", false, "increase the verbosity.")
 	flag.StringVar(&xxhsum_filepath, "xxhsum-filepath", "", "FILEPATH to file to append to.")
@@ -168,7 +171,7 @@ func main() {
 
 	flag.Parse()
 
-	// Parsing argument for given_path
+	// Parsing PATH argument for given_path
 	if flag.NArg() != 1 {
 		log.Fatalf("PATH agrument missing.\n")
 	}
@@ -190,6 +193,9 @@ func main() {
 		log.Printf("DEBUG xxhsum-path=%v\n", xxhsum_filepath)
 	}
 
+	/*
+		Doing the do
+	*/
 	dict = load_xxhsum_file(xxhsum_filepath)
 
 	if verbose {
