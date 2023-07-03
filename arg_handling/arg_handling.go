@@ -61,7 +61,7 @@ func Param_parse(param string, verbose bool) string {
 		file_path string
 	)
 
-	if strings.HasPrefix(param, "~/") {
+	if strings.HasPrefix(param, "~") {
 		param = expand_tilde(param)
 	}
 	if file_path, err = filepath.Abs(param); err != nil {
