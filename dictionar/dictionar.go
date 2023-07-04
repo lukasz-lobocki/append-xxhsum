@@ -2,12 +2,13 @@ package dictionar
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"strings"
 )
 
-func Load_xxhsum_file(in_file string) map[string]string {
+func Load_xxhsum_file(in_file string) (map[string]string, error) {
 
 	var (
 		file *os.File          = nil
@@ -17,9 +18,9 @@ func Load_xxhsum_file(in_file string) map[string]string {
 
 	// Open the text file
 	if file, err = os.Open(in_file); err != nil {
-		defer file.Close()
-		log.Fatalln("Error opening file:", err)
+		return nil, fmt.Errorf("error opening file: %s; %w", in_file, err)
 	}
+	defer file.Close()
 
 	// Create a dictionary (map) to store the data
 	data = make(map[string]string)
@@ -38,11 +39,10 @@ func Load_xxhsum_file(in_file string) map[string]string {
 
 	// Check for any scanning errors
 	if err := scanner.Err(); err != nil {
-		log.Fatalln("Error scanning file:", err)
-		return nil
+		return nil, fmt.Errorf("error scanning: %s; %w", in_file, err)
 	}
 
-	return data
+	return data, nil
 }
 
 func Dump_xxhsum_dict(in_data map[string]string) {

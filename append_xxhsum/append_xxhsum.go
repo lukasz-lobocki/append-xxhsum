@@ -15,13 +15,26 @@ import (
 	"github.com/cespare/xxhash/v2"
 )
 
+const (
+	RESET  string = "\033[0m"
+	RED    string = "\033[31m"
+	GREEN  string = "\033[32m"
+	YELLOW string = "\033[33m"
+	Blue   string = "\033[34m"
+	Purple string = "\033[35m"
+	Cyan   string = "\033[36m"
+	Gray   string = "\033[37m"
+	White  string = "\033[97m"
+)
+
 func search_dir(root string, dict map[string]string, xxhsum_filepath string, verbose bool) {
+
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			log.Printf("Error accessing path %s: %v\n", path, err)
 			return nil
 		}
-
+		log.Printf("DUPA")
 		if info.IsDir() {
 			// Skip directories
 			return nil
@@ -34,7 +47,7 @@ func search_dir(root string, dict map[string]string, xxhsum_filepath string, ver
 
 			if _, ok := dict[rel_path]; ok {
 				if verbose {
-					log.Printf("INFO %s exists.\n", rel_path)
+					log.Printf(GREEN+"INFO"+RESET+" %s exists.\n", rel_path)
 				}
 				return nil
 			} else {
@@ -43,7 +56,7 @@ func search_dir(root string, dict map[string]string, xxhsum_filepath string, ver
 				} else {
 					line := fmt.Sprintf("%s  %s\n", checksum, rel_path)
 					fmt.Print(line)
-					append_to_file(xxhsum_filepath, line)
+					_ = append_to_file(xxhsum_filepath, line)
 				}
 			}
 		}
@@ -59,6 +72,7 @@ func search_dir(root string, dict map[string]string, xxhsum_filepath string, ver
 func calculateXXHash(filePath string) (string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
+
 		return "", err
 	}
 	defer file.Close()
@@ -72,13 +86,12 @@ func calculateXXHash(filePath string) (string, error) {
 	return strconv.FormatUint(hash.Sum64(), 16), nil
 }
 
-func append_to_file(filename string, content string) {
+func append_to_file(filename string, content string) error {
 	// Open the file in append mode, create it if it doesn't exist
 	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	defer file.Close()
 
 	// Create a buffered writer for efficient writing
 	writer := bufio.NewWriter(file)
@@ -86,14 +99,15 @@ func append_to_file(filename string, content string) {
 	// Write the content to the file
 	_, err = writer.WriteString(content)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// Flush the buffer to ensure the content is written
 	err = writer.Flush()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return file.Close()
 }
 
 func init() {
@@ -116,18 +130,6 @@ func main() {
 		err             error             = nil
 	)
 
-	const (
-		RESET  = "\033[0m"
-		RED    = "\033[31m"
-		Green  = "\033[32m"
-		Yellow = "\033[33m"
-		Blue   = "\033[34m"
-		Purple = "\033[35m"
-		Cyan   = "\033[36m"
-		Gray   = "\033[37m"
-		White  = "\033[97m"
-	)
-
 	/*
 		Parsing input
 	*/
@@ -138,40 +140,50 @@ func main() {
 
 	flag.Parse()
 
-	// Parsing PATH argument for given_path
+	/*
+		Parsing PATH argument for given_path
+	*/
 	if flag.NArg() != 1 {
-		log.Fatalf("PATH agrument missing.\n")
+		log.Fatalln(RED + "PATH agrument missing." + RESET)
 	}
+
 	given_path, err = arg_handling.Arg_parse(flag.Arg(0), verbose)
 	if err != nil {
 		log.Fatalf(RED+"%s"+RESET, err)
 	}
+
 	parent_path = filepath.Dir(given_path)
 
-	// Parsing parameter xxhsum-filepath
+	/*
+		Parsing parameter xxhsum-filepath
+	*/
 	if xxhsum_filepath == "" {
 		xxhsum_filepath = given_path + ".xxhsum"
 		if verbose {
 			log.Printf("--xxhsum-filepath defaulted to %s\n", xxhsum_filepath)
 		}
 	}
+
 	xxhsum_filepath, exists, err = arg_handling.Param_parse(xxhsum_filepath, verbose)
 	if err != nil {
 		log.Fatalf(RED+"%s"+RESET, err)
 	}
 
 	if DEBUG {
-		log.Printf("DEBUG given_path=%v\n", given_path) //\033[1;0m
-		log.Printf("DEBUG parent_dir=%v\n", parent_path)
-		log.Printf("DEBUG xxhsum-path=%v\n", xxhsum_filepath)
-		log.Printf("DEBUG xxhsum-path exists=%t\n", exists)
+		log.Printf(YELLOW+"DEBUG"+RESET+" given_path=%v\n", given_path)
+		log.Printf(YELLOW+"DEBUG"+RESET+" parent_dir=%v\n", parent_path)
+		log.Printf(YELLOW+"DEBUG"+RESET+" xxhsum-path=%v\n", xxhsum_filepath)
+		log.Printf(YELLOW+"DEBUG"+RESET+" xxhsum-path exists=%t\n", exists)
 	}
 
 	/*
 		Doing the do
 	*/
 	if exists {
-		dict = dictionar.Load_xxhsum_file(xxhsum_filepath)
+		dict, err = dictionar.Load_xxhsum_file(xxhsum_filepath)
+		if err != nil {
+			log.Fatalf(RED+"%s"+RESET, err)
+		}
 
 		if verbose {
 			dictionar.Dump_xxhsum_dict(dict)

@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-const Usage = `
+const Usage string = `
 Usage: %s [--xxhsum-filepath FILEPATH] [--verbose] [--help] PATH
 
 Recursively adds missing xxhsum hashes from PATH to --xxhsum-filepath.
@@ -34,14 +34,14 @@ func Arg_parse(arg string, verbose bool) (string, error) {
 	)
 
 	if dir_path, err = filepath.Abs(arg); err != nil {
-		return "", errors.Join(fmt.Errorf("error resolving filepath: %s", arg), err)
+		return "", fmt.Errorf("error resolving filepath: %s; %w", arg, err)
 	}
 
 	if file_info, err := os.Stat(dir_path); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return "", errors.Join(fmt.Errorf("does not exist: %s", dir_path), err)
+			return "", fmt.Errorf("does not exist: %s; %w", dir_path, err)
 		} else {
-			return "", errors.Join(fmt.Errorf("error accessing file: %s", dir_path), err)
+			return "", fmt.Errorf("error accessing file: %s; %w", dir_path, err)
 		}
 	} else {
 		if !file_info.Mode().IsDir() {
@@ -70,7 +70,7 @@ func Param_parse(param string, verbose bool) (string, bool, error) {
 		if errors.Is(err, os.ErrNotExist) {
 			return file_path, false, nil
 		} else {
-			return "", false, errors.Join(fmt.Errorf("error accessing file: %s", file_path), err)
+			return "", false, fmt.Errorf("error accessing file: %s; %w", file_path, err)
 		}
 	} else {
 		if file_info.Mode().IsRegular() {
@@ -91,10 +91,10 @@ func expand_tilde(in_path string) (string, error) {
 	}
 
 	if usr, err := user.Current(); err != nil {
-		return "", errors.Join(fmt.Errorf("no current user"), err)
+		return "", fmt.Errorf("no current user; %w", err)
 	} else {
 		if dir, err := filepath.Abs(usr.HomeDir); err != nil {
-			return "", errors.Join(fmt.Errorf("no homedir"), err)
+			return "", fmt.Errorf("no homedir; %w", err)
 		} else {
 			switch true {
 			case in_path == "~":
