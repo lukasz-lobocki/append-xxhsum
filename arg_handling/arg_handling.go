@@ -67,19 +67,19 @@ func Param_parse(param string, verbose bool) (string, bool, error) {
 	}
 
 	if file_info, err := os.Stat(file_path); err != nil {
-		if !errors.Is(err, os.ErrNotExist) {
-			return "", false, errors.Join(fmt.Errorf("error accessing file: %s", file_path), err)
-		} else {
+		if errors.Is(err, os.ErrNotExist) {
 			return file_path, false, nil
+		} else {
+			return "", false, errors.Join(fmt.Errorf("error accessing file: %s", file_path), err)
 		}
 	} else {
-		if !file_info.Mode().IsRegular() {
-			return "", true, fmt.Errorf("exists but is not a file: %s", file_path)
-		} else {
+		if file_info.Mode().IsRegular() {
 			if verbose {
 				log.Printf("%s is a file.\n", file_path)
 			}
 			return file_path, true, nil
+		} else {
+			return "", true, fmt.Errorf("exists but is not a file: %s", file_path)
 		}
 	}
 }
