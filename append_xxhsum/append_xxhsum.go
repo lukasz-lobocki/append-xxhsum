@@ -34,7 +34,7 @@ func search_dir(root string, dict map[string]string, xxhsum_filepath string, ver
 			log.Printf("Error accessing path %s: %v\n", path, err)
 			return nil
 		}
-		log.Printf("DUPA")
+		log.Println(info.Name())
 		if info.IsDir() {
 			// Skip directories
 			return nil
