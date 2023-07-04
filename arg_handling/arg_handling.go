@@ -97,10 +97,6 @@ func expand_tilde(in_path string) (string, error) {
 			return "", errors.Join(fmt.Errorf("no homedir"), err)
 		} else {
 			switch true {
-			case !strings.HasPrefix(in_path, "~"):
-				{
-					return "", errors.Join(fmt.Errorf("no current user"), err)
-				}
 			case in_path == "~":
 				{
 					return dir, nil
