@@ -16,8 +16,7 @@ func Load_xxhsum_file(in_file string) map[string]string {
 	)
 
 	// Open the text file
-	file, err = os.Open(in_file)
-	if err != nil {
+	if file, err = os.Open(in_file); err != nil {
 		defer file.Close()
 		log.Fatalln("Error opening file:", err)
 	}

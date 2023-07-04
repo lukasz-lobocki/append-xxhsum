@@ -34,7 +34,7 @@ func search_dir(root string, dict map[string]string, xxhsum_filepath string, ver
 
 			if _, ok := dict[rel_path]; ok {
 				if verbose {
-					log.Printf("%s exists.\n", rel_path)
+					log.Printf("INFO %s exists.\n", rel_path)
 				}
 				return nil
 			} else {
@@ -139,11 +139,10 @@ func main() {
 			log.Printf("--xxhsum-filepath defaulted to %s\n", xxhsum_filepath)
 		}
 	}
-
 	xxhsum_filepath, exists = arg_handling.Param_parse(xxhsum_filepath, verbose)
 
 	if DEBUG {
-		log.Printf("DEBUG given_path=%v\n", given_path)
+		log.Printf("DEBUG given_path=%v\n", given_path) //\033[1;0m
 		log.Printf("DEBUG parent_dir=%v\n", parent_path)
 		log.Printf("DEBUG xxhsum-path=%v\n", xxhsum_filepath)
 		log.Printf("DEBUG xxhsum-path exists=%t\n", exists)
