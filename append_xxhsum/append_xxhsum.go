@@ -97,7 +97,7 @@ func append_to_file(filename string, content string) {
 }
 
 func init() {
-	log.SetPrefix(filepath.Base(os.Args[0] + `: `))
+	log.SetPrefix(filepath.Base(os.Args[0] + " "))
 	log.SetFlags(0)
 	flag.Usage = func() { fmt.Printf(arg_handling.Usage, filepath.Base(os.Args[0])) }
 }
@@ -113,6 +113,19 @@ func main() {
 		parent_path     string            = ""
 		dict            map[string]string = nil
 		exists          bool              = false
+		err             error             = nil
+	)
+
+	const (
+		RESET  = "\033[0m"
+		RED    = "\033[31m"
+		Green  = "\033[32m"
+		Yellow = "\033[33m"
+		Blue   = "\033[34m"
+		Purple = "\033[35m"
+		Cyan   = "\033[36m"
+		Gray   = "\033[37m"
+		White  = "\033[97m"
 	)
 
 	/*
@@ -129,7 +142,10 @@ func main() {
 	if flag.NArg() != 1 {
 		log.Fatalf("PATH agrument missing.\n")
 	}
-	given_path = arg_handling.Arg_parse(flag.Arg(0), verbose)
+	given_path, err = arg_handling.Arg_parse(flag.Arg(0), verbose)
+	if err != nil {
+		log.Fatalf(RED+"%s"+RESET, err)
+	}
 	parent_path = filepath.Dir(given_path)
 
 	// Parsing parameter xxhsum-filepath
@@ -139,7 +155,10 @@ func main() {
 			log.Printf("--xxhsum-filepath defaulted to %s\n", xxhsum_filepath)
 		}
 	}
-	xxhsum_filepath, exists = arg_handling.Param_parse(xxhsum_filepath, verbose)
+	xxhsum_filepath, exists, err = arg_handling.Param_parse(xxhsum_filepath, verbose)
+	if err != nil {
+		log.Fatalf(RED+"%s"+RESET, err)
+	}
 
 	if DEBUG {
 		log.Printf("DEBUG given_path=%v\n", given_path) //\033[1;0m

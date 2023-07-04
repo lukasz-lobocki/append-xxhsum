@@ -2,6 +2,7 @@ package arg_handling
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"os/user"
@@ -24,7 +25,7 @@ Parameters:
 -h, --help                    show this help message and exit.
 `
 
-func Arg_parse(arg string, verbose bool) string {
+func Arg_parse(arg string, verbose bool) (string, error) {
 	// PATH
 
 	var (
@@ -33,74 +34,86 @@ func Arg_parse(arg string, verbose bool) string {
 	)
 
 	if dir_path, err = filepath.Abs(arg); err != nil {
-		log.Fatalln("Error resolving filepath:", err)
+		return "", errors.Join(fmt.Errorf("error resolving filepath: %s", arg), err)
 	}
 
 	if file_info, err := os.Stat(dir_path); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			log.Fatalf("%s does not exist.\n", dir_path)
+			return "", errors.Join(fmt.Errorf("does not exist: %s", dir_path), err)
 		} else {
-			log.Fatalln("Error accessing file:", err)
+			return "", errors.Join(fmt.Errorf("error accessing file: %s", dir_path), err)
 		}
 	} else {
 		if !file_info.Mode().IsDir() {
-			log.Fatalf("%s exists but is not a directory.\n", dir_path)
+			return "", fmt.Errorf("exists but is not a directory: %s", dir_path)
 		} else if verbose {
 			log.Printf("%s is a directory.\n", dir_path)
 		}
 	}
-	return dir_path
+	return dir_path, nil
 }
 
-func Param_parse(param string, verbose bool) (string, bool) {
+func Param_parse(param string, verbose bool) (string, bool, error) {
 	// xxhsum-filepath
 
 	var (
 		err       error  = nil
 		file_path string = ""
-		exists    bool   = false
 	)
 
-	if strings.HasPrefix(param, "~") {
-		param = expand_tilde(param)
-	}
-	if file_path, err = filepath.Abs(param); err != nil {
-		log.Fatalln("Error resolving filepath:", err)
+	file_path, err = expand_tilde(param)
+	if err != nil {
+		return "", false, err
 	}
 
 	if file_info, err := os.Stat(file_path); err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
-			log.Fatalln("Error accessing file:", err)
+			return "", false, errors.Join(fmt.Errorf("error accessing file: %s", file_path), err)
+		} else {
+			return file_path, false, nil
 		}
 	} else {
 		if !file_info.Mode().IsRegular() {
-			log.Fatalf("%s exists but is not a file.\n", file_path)
+			return "", true, fmt.Errorf("exists but is not a file: %s", file_path)
 		} else {
-			exists = true
 			if verbose {
 				log.Printf("%s is a file.\n", file_path)
 			}
+			return file_path, true, nil
 		}
 	}
-	return file_path, exists
 }
 
-func expand_tilde(path string) string {
+func expand_tilde(in_path string) (string, error) {
+
+	if !strings.HasPrefix(in_path, "~") {
+		return in_path, nil
+	}
+
 	if usr, err := user.Current(); err != nil {
-		log.Fatalln("No current user:", err)
+		return "", errors.Join(fmt.Errorf("no current user"), err)
 	} else {
 		if dir, err := filepath.Abs(usr.HomeDir); err != nil {
-			log.Fatalln("No homedir:", err)
+			return "", errors.Join(fmt.Errorf("no homedir"), err)
 		} else {
-			if path == "~" {
-				// In case of "~", which won't be caught by the "else if"
-				path = dir
-			} else if strings.HasPrefix(path, "~/") {
-				// Use strings.HasPrefix so we don't match paths like
-				// "/something/~/something/"
-				path = filepath.Join(dir, path[2:])
+			switch true {
+			case !strings.HasPrefix(in_path, "~"):
+				{
+					return "", errors.Join(fmt.Errorf("no current user"), err)
+				}
+			case in_path == "~":
+				{
+					return dir, nil
+				}
+			case strings.HasPrefix(in_path, "~/"):
+				{
+					return filepath.Join(dir, in_path[2:]), nil
+				}
+			default:
+				{
+					return "", fmt.Errorf("error resolving filepath: %s", in_path)
+				}
 			}
 		}
 	}
-	return path
 }

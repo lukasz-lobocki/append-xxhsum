@@ -4,20 +4,31 @@ import "testing"
 
 func Test_expand_tilde(t *testing.T) {
 	type args struct {
-		path string
+		in_path string
 	}
 	tests := []struct {
-		name string
-		args args
-		want string
+		name    string
+		args    args
+		want    string
+		wantErr bool
 	}{
-		{"no change", args{"./Bulba"}, "./Bulba"},
-		{"just tilde", args{"~"}, "/home/lukasz"},
-		{"tilde", args{"~/Documents"}, "/home/lukasz/Documents"},
+		{"NO CHANGE", args{"./Bulba"}, "./Bulba", false},
+		{"NO CHANGE", args{"/kolo/Dmenats"}, "/kolo/Dmenats", false},
+		{"NO CHANGE", args{"kolo/Domenats"}, "kolo/Domenats", false},
+		{"EXPAND JUST TILDE", args{"~"}, "/home/lukasz", false},
+		{"EXPAND TILDE PREFIX", args{"~/Documents"}, "/home/lukasz/Documents", false},
+		{"EXPAND TILDE PREFIX", args{"~/Documents/Bulba"}, "/home/lukasz/Documents/Bulba", false},
+		{"EXPAND TILDE PREFIX", args{"~/kolo/~/Documenats"}, "/home/lukasz/kolo/~/Documenats", false},
+		{"GIBBERISH1", args{"~kolo/Documenats"}, "", true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := expand_tilde(tt.args.path); got != tt.want {
+			got, err := expand_tilde(tt.args.in_path)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("expand_tilde() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
 				t.Errorf("expand_tilde() = %v, want %v", got, tt.want)
 			}
 		})
