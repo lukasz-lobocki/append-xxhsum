@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
@@ -27,15 +28,27 @@ const (
 	White  string = "\033[97m"
 )
 
+/* func search_dir2(root string, dict map[string]string, xxhsum_filepath string, verbose bool) {
+	err := filepath.WalkDir("/home/lukasz/~Docume", visit)
+	fmt.Printf("filepath WalkDir returned %v\n", err)
+	log.Fatalln("DDDUUUPPAA")
+} */
+
+/*
+	 func visit(path string, di fs.DirEntry, err error,) error {
+		fmt.Printf("Visited: %s\n", path)
+		return nil
+	}
+*/
 func search_dir(root string, dict map[string]string, xxhsum_filepath string, verbose bool) {
 
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+	err := filepath.WalkDir(root, func(path string, di fs.DirEntry, err error) error {
 		if err != nil {
 			log.Printf("error accessing path %s; skipping %v\n", path, err)
 			return nil
 		}
 
-		if info.IsDir() {
+		if di.IsDir() {
 			// Skip directories
 			return nil
 		}
