@@ -63,7 +63,6 @@ func search_dir(root string, dict map[string]string, xxhsum_filepath string, ver
 				if verbose {
 					log.Printf(GREEN+"INFO"+RESET+" %s exists; skipping\n", rel_path)
 				}
-				return nil
 			} else {
 				// Not found
 				if checksum, err := calculateXXHash(path); err != nil {
@@ -77,7 +76,6 @@ func search_dir(root string, dict map[string]string, xxhsum_filepath string, ver
 				}
 			}
 		}
-
 		return nil
 	})
 
