@@ -31,32 +31,36 @@ func search_dir(root string, dict map[string]string, xxhsum_filepath string, ver
 
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			log.Printf("Error accessing path %s: %v\n", path, err)
+			log.Printf("error accessing path %s; skipping %v\n", path, err)
 			return nil
 		}
-		log.Println(info.Name())
+
 		if info.IsDir() {
 			// Skip directories
 			return nil
 		}
 
 		if rel_path, err := filepath.Rel(filepath.Dir(xxhsum_filepath), path); err != nil {
-			log.Printf("Error resolving filepath: %v", err)
+			log.Printf("error resolving filepath; skipping %v\n", err)
 		} else {
 			rel_path = "./" + rel_path
 
 			if _, ok := dict[rel_path]; ok {
+				// Found
 				if verbose {
-					log.Printf(GREEN+"INFO"+RESET+" %s exists.\n", rel_path)
+					log.Printf(GREEN+"INFO"+RESET+" %s exists; skipping\n", rel_path)
 				}
 				return nil
 			} else {
+				// Not found
 				if checksum, err := calculateXXHash(path); err != nil {
-					log.Printf("Error calculating xxHash: %v", err)
+					log.Printf("error calculating xxHash: %v\n", err)
 				} else {
 					line := fmt.Sprintf("%s  %s\n", checksum, rel_path)
 					fmt.Print(line)
-					_ = append_to_file(xxhsum_filepath, line)
+					if err := append_to_file(xxhsum_filepath, line); err != nil {
+						log.Printf("error appending to file %s; skipping %v\n", xxhsum_filepath, err)
+					}
 				}
 			}
 		}
@@ -118,8 +122,6 @@ func init() {
 
 func main() {
 
-	const DEBUG = true
-
 	var (
 		verbose         bool              = false
 		xxhsum_filepath string            = ""
@@ -169,16 +171,16 @@ func main() {
 		log.Fatalf(RED+"%s"+RESET, err)
 	}
 
-	if DEBUG {
+	/*
+		Doing the do
+	*/
+	if verbose {
 		log.Printf(YELLOW+"DEBUG"+RESET+" given_path=%v\n", given_path)
 		log.Printf(YELLOW+"DEBUG"+RESET+" parent_dir=%v\n", parent_path)
 		log.Printf(YELLOW+"DEBUG"+RESET+" xxhsum-path=%v\n", xxhsum_filepath)
 		log.Printf(YELLOW+"DEBUG"+RESET+" xxhsum-path exists=%t\n", exists)
 	}
 
-	/*
-		Doing the do
-	*/
 	if exists {
 		dict, err = dictionar.Load_xxhsum_file(xxhsum_filepath)
 		if err != nil {
