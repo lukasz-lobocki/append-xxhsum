@@ -1,6 +1,8 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 func Test_calculateXXHash(t *testing.T) {
 	type args struct {
@@ -24,6 +26,27 @@ func Test_calculateXXHash(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("calculateXXHash() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_append_to_file(t *testing.T) {
+	type args struct {
+		filename string
+		content  string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"FILE", args{"/home/lukasz/Code/golang/xxhsum/test.xx_append", "Lorem ipsum\n"}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := append_to_file(tt.args.filename, tt.args.content); (err != nil) != tt.wantErr {
+				t.Errorf("append_to_file() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
