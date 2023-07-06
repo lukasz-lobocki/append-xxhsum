@@ -10,9 +10,11 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"time"
 	"xxhsum/arg_handling"
 	"xxhsum/dictionar"
 
+	"github.com/briandowns/spinner"
 	"github.com/cespare/xxhash/v2"
 )
 
@@ -28,7 +30,10 @@ const (
 	White  string = "\033[97m"
 )
 
-func search_dir(root string, dict map[string]string, xxhsum_filepath string, verbose bool) {
+func search_dir(root string, dict map[string]string, xxhsum_filepath string, bsd_style bool, verbose bool) {
+	var (
+		line string
+	)
 
 	err := filepath.WalkDir(root, func(path string, di fs.DirEntry, err error) error {
 		if err != nil {
@@ -41,8 +46,17 @@ func search_dir(root string, dict map[string]string, xxhsum_filepath string, ver
 			return nil
 		}
 
+		if fileInfo, err := di.Info(); err != nil {
+			log.Printf("error accessing file %s; skipping %v\n", di.Name(), err)
+			return nil
+		} else {
+			if fileInfo.Mode()&os.ModeSymlink != 0 {
+				return nil // Skip symbolic links
+			}
+		}
+
 		if rel_path, err := filepath.Rel(filepath.Dir(xxhsum_filepath), path); err != nil {
-			log.Printf("error resolving filepath; skipping %v\n", err)
+			log.Printf("error resolving relative path; skipping %v\n", err)
 		} else {
 			rel_path = "./" + rel_path
 
@@ -56,10 +70,19 @@ func search_dir(root string, dict map[string]string, xxhsum_filepath string, ver
 				if checksum, err := calculateXXHash(path); err != nil {
 					log.Printf("error calculating xxHash: %v\n", err)
 				} else {
-					line := fmt.Sprintf("%s  %s\n", checksum, rel_path)
-					fmt.Print(line)
+					// Calculate line
+					if bsd_style {
+						line = fmt.Sprintf("XXH64 (%s) = %s\n", rel_path, checksum)
+					} else {
+						line = fmt.Sprintf("%s  %s\n", checksum, rel_path)
+					}
+
+					// Emit line
 					if err := append_to_file(xxhsum_filepath, line); err != nil {
 						log.Printf("error appending to file %s; skipping %v\n", xxhsum_filepath, err)
+					}
+					if verbose {
+						fmt.Print(line)
 					}
 				}
 			}
@@ -121,13 +144,14 @@ func init() {
 func main() {
 
 	var (
-		verbose         bool              = false
-		xxhsum_filepath string            = ""
-		given_path      string            = ""
-		parent_path     string            = ""
-		dict            map[string]string = nil
-		exists          bool              = false
-		err             error             = nil
+		verbose            bool              = false
+		bsd_style          bool              = false
+		xxhsum_filepath    string            = ""
+		given_path         string            = ""
+		parent_path        string            = ""
+		dict               map[string]string = nil
+		xxhsum_file_exists bool              = false
+		err                error             = nil
 	)
 
 	/*
@@ -135,6 +159,8 @@ func main() {
 	*/
 	flag.BoolVar(&verbose, "verbose", false, "increase the verbosity.")
 	flag.BoolVar(&verbose, "v", false, "increase the verbosity.")
+	flag.BoolVar(&bsd_style, "bsd-style", false, "BSD-style checksum lines.")
+	flag.BoolVar(&bsd_style, "b", false, "BSD-style checksum lines.")
 	flag.StringVar(&xxhsum_filepath, "xxhsum-filepath", "", "FILEPATH to file to append to.")
 	flag.StringVar(&xxhsum_filepath, "x", "", "FILEPATH to file to append to.")
 
@@ -164,7 +190,7 @@ func main() {
 		}
 	}
 
-	xxhsum_filepath, exists, err = arg_handling.Param_parse(xxhsum_filepath, verbose)
+	xxhsum_filepath, xxhsum_file_exists, err = arg_handling.Param_parse(xxhsum_filepath, verbose)
 	if err != nil {
 		log.Fatalf(RED+"%s"+RESET, err)
 	}
@@ -176,11 +202,20 @@ func main() {
 		log.Printf(YELLOW+"DEBUG"+RESET+" given_path=%v\n", given_path)
 		log.Printf(YELLOW+"DEBUG"+RESET+" parent_dir=%v\n", parent_path)
 		log.Printf(YELLOW+"DEBUG"+RESET+" xxhsum-path=%v\n", xxhsum_filepath)
-		log.Printf(YELLOW+"DEBUG"+RESET+" xxhsum-path exists=%t\n", exists)
+		log.Printf(YELLOW+"DEBUG"+RESET+" xxhsum-path exists=%t\n", xxhsum_file_exists)
 	}
 
-	if exists {
-		dict, err = dictionar.Load_xxhsum_file(xxhsum_filepath)
+	if xxhsum_file_exists {
+		s := spinner.New(spinner.CharSets[14], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
+		s.Prefix = "Loading: "
+		s.FinalMSG = "Loading complete\n"
+		s.Start()
+
+		// Load xxhsum_file to dictionary
+		dict, err = dictionar.Load_xxhsum_file(xxhsum_filepath, bsd_style)
+
+		s.Stop()
+
 		if err != nil {
 			log.Fatalf(RED+"%s"+RESET, err)
 		}
@@ -190,7 +225,19 @@ func main() {
 		}
 	}
 
-	search_dir(given_path, dict, xxhsum_filepath, verbose)
+	s := spinner.New(spinner.CharSets[14], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
+	if !verbose {
+		s.Prefix = "Searching: "
+		s.FinalMSG = "Searching complete\n"
+		s.Start()
+	}
+
+	// Search given_path against dictionary
+	search_dir(given_path, dict, xxhsum_filepath, bsd_style, verbose)
+
+	if !verbose {
+		s.Stop()
+	}
 
 	dict = nil
 }

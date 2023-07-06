@@ -11,18 +11,18 @@ import (
 )
 
 const Usage string = `
-Usage: %s [--xxhsum-filepath FILEPATH] [--verbose] [--help] PATH
+Usage: %s [--xxhsum-filepath FILEPATH] [--bsd-style] [--verbose] [--help] PATH
 
-Recursively adds missing xxhsum hashes from PATH to --xxhsum-filepath.
+Recursively adds missing xxhsum (XXH64) hashes from PATH to --xxhsum-filepath.
 
 Arguments:
-PATH                          PATH to analyze. Must exist and be readable (+r) and browsable/executable (+x).
+PATH                            PATH to analyze.
 
 Parameters:
--x, --xxhsum-filepath         FILEPATH to file to append to. Defaults to PATH\..\DIRNAME.xxhsum. Must be readable (+r)
-                              and writable (+w).
--v, --verbose                 increase the verbosity of the bash script.
--h, --help                    show this help message and exit.
+-x, --xxhsum-filepath           FILEPATH to file to append to.
+-b, --bsd-style                 BSD-style checksum lines. Defaults to GNU-style.
+-v, --verbose                   increase the verbosity of the bash script.
+-h, --help                      show this help message and exit.
 `
 
 func Arg_parse(arg string, verbose bool) (string, error) {
