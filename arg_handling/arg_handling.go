@@ -33,7 +33,7 @@ func Arg_parse(arg string, verbose bool) (string, error) {
 		dir_path string = ""
 	)
 
-	if dir_path, err = filepath.Abs(arg); err != nil {
+	if dir_path, err = filepath.Abs(filepath.Clean(arg)); err != nil {
 		return "", fmt.Errorf("error resolving filepath: %s; %w", arg, err)
 	}
 
@@ -61,9 +61,12 @@ func Param_parse(param string, verbose bool) (string, bool, error) {
 		file_path string = ""
 	)
 
-	file_path, err = expand_tilde(param)
+	param, err = expand_tilde(param)
 	if err != nil {
 		return "", false, err
+	}
+	if file_path, err = filepath.Abs(filepath.Clean(param)); err != nil {
+		return "", false, fmt.Errorf("error resolving filepath: %s; %w", param, err)
 	}
 
 	if file_info, err := os.Stat(file_path); err != nil {
@@ -87,7 +90,7 @@ func Param_parse(param string, verbose bool) (string, bool, error) {
 func expand_tilde(in_path string) (string, error) {
 
 	if !strings.HasPrefix(in_path, "~") {
-		return in_path, nil
+		return filepath.Clean(in_path), nil
 	}
 
 	if usr, err := user.Current(); err != nil {

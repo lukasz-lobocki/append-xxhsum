@@ -14,14 +14,20 @@ func Test_expand_tilde(t *testing.T) {
 		want    string
 		wantErr bool
 	}{
-		{"NO CHANGE", args{"./Bulba"}, "./Bulba", false},
-		{"NO CHANGE", args{"/kolo/Dmenats"}, "/kolo/Dmenats", false},
+		{"NO CHANGE", args{"./Bulba"}, "Bulba", false},
+		{"NO CHANGE", args{"./Bulba/"}, "Bulba", false},
 		{"NO CHANGE", args{"kolo/Domenats"}, "kolo/Domenats", false},
+		{"NO CHANGE", args{"/kolo/Dmenats"}, "/kolo/Dmenats", false},
+		{"NO CHANGE", args{"kolo/Domenats/"}, "kolo/Domenats", false},
+		{"NO CHANGE", args{"/kolo/Domenats/"}, "/kolo/Domenats", false},
 		{"EXPAND JUST TILDE", args{"~"}, "/home/lukasz", false},
 		{"EXPAND TILDE PREFIX", args{"~/Documents"}, "/home/lukasz/Documents", false},
+		{"EXPAND TILDE PREFIX", args{"~/Documents/"}, "/home/lukasz/Documents", false},
 		{"EXPAND TILDE PREFIX", args{"~/Documents/Bulba"}, "/home/lukasz/Documents/Bulba", false},
 		{"EXPAND TILDE PREFIX", args{"~/kolo/~/Documenats"}, "/home/lukasz/kolo/~/Documenats", false},
 		{"GIBBERISH1", args{"~kolo/Documenats"}, "", true},
+		{"GIBBERISH1", args{"~kolo/Documenats/"}, "", true},
+		{"GIBBERISH1", args{"~.kolo/Documenats/"}, "", true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -88,6 +94,7 @@ func TestParam_parse(t *testing.T) {
 		{"FILE with TILDE", args{"~/.profile", true}, "/home/lukasz/.profile", true, false},
 		{"NON EXISTING FILE with TILDE", args{"~/.profilwee", true}, "/home/lukasz/.profilwee", false, false},
 		{"DIR", args{"/home/lukasz/Documents", true}, "", true, true},
+		{"DIR", args{"/home/lukasz/Documents/", true}, "", true, true},
 		{"ROOT HOMEDIR FILE", args{"/root/.profile", true}, "", false, true},
 		{"FILE WITH WRONG TILDE", args{"~.profile", true}, "", false, true},
 	}

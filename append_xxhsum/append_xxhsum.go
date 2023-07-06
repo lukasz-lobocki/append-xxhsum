@@ -28,18 +28,6 @@ const (
 	White  string = "\033[97m"
 )
 
-/* func search_dir2(root string, dict map[string]string, xxhsum_filepath string, verbose bool) {
-	err := filepath.WalkDir("/home/lukasz/~Docume", visit)
-	fmt.Printf("filepath WalkDir returned %v\n", err)
-	log.Fatalln("DDDUUUPPAA")
-} */
-
-/*
-	 func visit(path string, di fs.DirEntry, err error,) error {
-		fmt.Printf("Visited: %s\n", path)
-		return nil
-	}
-*/
 func search_dir(root string, dict map[string]string, xxhsum_filepath string, verbose bool) {
 
 	err := filepath.WalkDir(root, func(path string, di fs.DirEntry, err error) error {
@@ -87,7 +75,6 @@ func search_dir(root string, dict map[string]string, xxhsum_filepath string, ver
 func calculateXXHash(filePath string) (string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-
 		return "", err
 	}
 	defer file.Close()
