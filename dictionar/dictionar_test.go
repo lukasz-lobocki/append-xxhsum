@@ -36,8 +36,8 @@ func TestLoadXXHSumFile(t *testing.T) {
 	}{
 		{"NO FILE", args{"/Bulba", false}, nil, true},
 		{"NO FILE", args{"/Bulba", true}, nil, true},
-		{"WRONG FILE", args{"/home/lukasz/.profile", false}, make(map[string]string), false},
 		{"WRONG FILE", args{"/home/lukasz/.profile", true}, make(map[string]string), false},
+		{"WRONG FILE", args{"/home/lukasz/.gitcommitmessage.txt", false}, make(map[string]string), false},
 		{"FILEA", args{"/home/lukasz/Code/golang/xxhsum/test.xxhsum", false}, map[string]string{
 			"./golang/goroot/go.mod": "1f809539dbc4e242", "./golang/goroot/sample-app/sample-app": "76b9b81ec1c51248"},
 			false},

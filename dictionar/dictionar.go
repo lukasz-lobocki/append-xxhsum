@@ -50,7 +50,6 @@ func LoadXXHSumFile(inputFile string, bsdStyle bool) (map[string]string, error) 
 				(\w+) captures one or more word characters as the hash value.
 				$ asserts the end of the line.
 			*/
-
 		} else {
 			// Load GNU-style line
 			loadLine(line, `^(?P<hashValue>.*?)  (?P<fileName>.*)$`, &data)
@@ -62,7 +61,6 @@ func LoadXXHSumFile(inputFile string, bsdStyle bool) (map[string]string, error) 
 				(.*) captures any remaining characters (except newline characters) greedily in the second group.
 				$ asserts the end of the line.
 			*/
-
 		}
 	}
 
