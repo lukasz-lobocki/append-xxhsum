@@ -19,7 +19,7 @@ import (
 	"github.com/cespare/xxhash/v2"
 )
 
-func searchDir(root string, dict map[string]string, xxhsumFilepath string, bsdStyle bool, verbose bool) {
+func searchDir(root string, dict *map[string]string, xxhsumFilepath string, bsdStyle bool, verbose bool) {
 
 	var (
 		line string
@@ -42,7 +42,7 @@ func searchDir(root string, dict map[string]string, xxhsumFilepath string, bsdSt
 		} else {
 			rel_path = "./" + rel_path
 
-			if _, ok := dict[rel_path]; ok {
+			if _, ok := (*dict)[rel_path]; ok {
 				// Found
 				if verbose {
 					log.Printf(globals.GREEN+"INFO"+globals.RESET+" %s exists; skipping\n", rel_path)
@@ -153,17 +153,6 @@ func init() {
 	flag.Usage = func() { fmt.Printf(arg_handling.Usage, filepath.Base(os.Args[0])) }
 }
 
-type configStru struct {
-	verbose  bool
-	bsdStyle bool
-}
-
-type pathsStru struct {
-	xxhsumFileExists bool
-	xxhsumFilepath   string
-	givenPath        string
-}
-
 func main() {
 
 	var (
@@ -178,9 +167,6 @@ func main() {
 	)
 
 	defer func() { dict = nil }()
-
-	config := configStru{verbose: false, bsdStyle: false}
-	log.Printf("DiUPA %v %v", &config.verbose, &config.bsdStyle)
 
 	/*
 		Parsing input
@@ -245,7 +231,7 @@ func main() {
 			/*
 				Dump xxhsum_file dictionary
 			*/
-			dictionar.DumpXXHSumDict(dict)
+			dictionar.DumpXXHSumDict(&dict)
 		}
 	}
 
@@ -257,7 +243,7 @@ func main() {
 	if !verbose {
 		s.Start()
 	}
-	searchDir(givenPath, dict, xxhsumFilepath, bsdStyle, verbose)
+	searchDir(givenPath, &dict, xxhsumFilepath, bsdStyle, verbose)
 	if !verbose {
 		s.Stop()
 	}

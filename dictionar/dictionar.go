@@ -90,9 +90,9 @@ func loadBSDStyleLine(line string, data map[string]string) {
 	}
 }
 
-func DumpXXHSumDict(inputData map[string]string) {
+func DumpXXHSumDict(inputData *map[string]string) {
 	// Print the dictionary contents
-	for key, value := range inputData {
+	for key, value := range *inputData {
 		log.Printf(globals.BLUE+"DUMP"+globals.RESET+" %s  %s\n", value, key)
 	}
 }
