@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"regexp"
-	"strings"
 	"xxhsum/globals"
 )
 
@@ -35,10 +34,35 @@ func LoadXXHSumFile(inputFile string, bsdStyle bool) (map[string]string, error) 
 
 		if bsdStyle {
 			// Load BSD-style line
-			loadBSDStyleLine(line, &data)
+			loadLine(line, `^XXH64\s*\((?P<fileName>.*)\)\s*=\s*(?P<hashValue>\w+)$`, &data)
+			/*
+				^ asserts the start of the line.
+				(\w+) captures one or more word characters as the algorithm name.
+				\s* matches zero or more whitespace characters.
+				\( matches the opening parenthesis.
+				(.*) captures any character (greedy) until the last occurrence of a closing parenthesis.
+					This ensures that the match group captures the text between the opening parenthesis and the last closing parenthesis in the file name.
+					Should work correctly even when the file name contains nested parentheses.
+				\) matches the last closing parenthesis.
+				\s* matches zero or more whitespace characters.
+				= matches the equals sign.
+				\s* matches zero or more whitespace characters.
+				(\w+) captures one or more word characters as the hash value.
+				$ asserts the end of the line.
+			*/
+
 		} else {
 			// Load GNU-style line
-			loadGNUStyleLine(line, &data)
+			loadLine(line, `^(?P<hashValue>.*?)  (?P<fileName>.*)$`, &data)
+			/*
+				^ asserts the start of the line.
+				(.*?) captures any characters (except newline characters) lazily in the first group. The ? makes the * quantifier non-greedy
+					so that it matches as few characters as possible.
+				'  ' matches the double space between the two groups.
+				(.*) captures any remaining characters (except newline characters) greedily in the second group.
+				$ asserts the end of the line.
+			*/
+
 		}
 	}
 
@@ -50,43 +74,19 @@ func LoadXXHSumFile(inputFile string, bsdStyle bool) (map[string]string, error) 
 	return data, nil
 }
 
-func loadGNUStyleLine(line string, data *map[string]string) {
-	parts := strings.Split(line, "  ")
-	if len(parts) == 2 {
-		fileName := strings.TrimSpace(parts[1])
-		hashValue := strings.TrimSpace(parts[0])
-		(*data)[fileName] = hashValue
-	}
-}
+func loadLine(line string, pattern string, data *map[string]string) {
 
-func loadBSDStyleLine(line string, data *map[string]string) {
-	pattern := `^(\w+)\s*\((.*?)\)\s*=\s*(\w+)$`
-	/*
-		^ asserts the start of the line.
-		(\w+) captures one or more word characters as the algorithm name.
-		\s* matches zero or more whitespace characters.
-		\( matches the opening parenthesis.
-		(.*?) captures any character (non-greedy) until the first occurrence of a closing parenthesis.
-			This ensures that the match group captures the text between the opening parenthesis and the last closing parenthesis in the file name.
-			Should work correctly even when the file name contains nested parentheses.
-		\) matches the last closing parenthesis.
-		\s* matches zero or more whitespace characters.
-		= matches the equals sign.
-		\s* matches zero or more whitespace characters.
-		(\w+) captures one or more word characters as the hash value.
-		$ asserts the end of the line.
-	*/
+	regex := regexp.MustCompile(pattern)
+	matches := regex.FindStringSubmatch(line)
 
-	re := regexp.MustCompile(pattern)
-	match := re.FindStringSubmatch(line)
+	if len(matches) == 3 {
+		groupNames := regex.SubexpNames()
+		result := make(map[string]string)
 
-	if len(match) == 4 {
-		algoName := match[1]
-		fileName := match[2]
-		hashValue := match[3]
-		if algoName == "XXH64" {
-			(*data)[fileName] = hashValue
+		for i, match := range matches {
+			result[groupNames[i]] = match
 		}
+		(*data)[result["fileName"]] = result["hashValue"]
 	}
 }
 

@@ -19,10 +19,11 @@ import (
 	"github.com/cespare/xxhash/v2"
 )
 
-func searchDir(root string, dict *map[string]string, xxhsumFilepath string, bsdStyle bool, verbose bool) {
+func searchDir(root string, dict *map[string]string, xxhsumFilepath string, bsdStyle bool, verbose bool) int {
 
 	var (
 		line string
+		i    int
 	)
 
 	err := filepath.WalkDir(root, func(path string, di fs.DirEntry, err error) error {
@@ -57,6 +58,7 @@ func searchDir(root string, dict *map[string]string, xxhsumFilepath string, bsdS
 
 					// Emit line
 					emitLine(xxhsumFilepath, line, verbose)
+					i++
 				}
 			}
 		}
@@ -66,6 +68,8 @@ func searchDir(root string, dict *map[string]string, xxhsumFilepath string, bsdS
 	if err != nil {
 		log.Fatalf("Error walking the path %s: %v\n", root, err)
 	}
+
+	return i
 }
 
 func calculateLine(bsdStyle bool, relPath string, checksum string) string {
@@ -148,7 +152,7 @@ func debugVariables(verbose bool, givenPath string, xxhsumFilepath string, xxhsu
 }
 
 func init() {
-	log.SetPrefix(filepath.Base(os.Args[0] + " "))
+	//log.SetPrefix(filepath.Base(os.Args[0] + " "))
 	log.SetFlags(0)
 	flag.Usage = func() { fmt.Printf(arg_handling.Usage, filepath.Base(os.Args[0])) }
 }
@@ -164,6 +168,7 @@ func main() {
 		dict             map[string]string = nil
 		err              error             = nil
 		s                *spinner.Spinner  = nil
+		i                int               = 0
 	)
 
 	defer func() { dict = nil }()
@@ -243,8 +248,10 @@ func main() {
 	if !verbose {
 		s.Start()
 	}
-	searchDir(givenPath, &dict, xxhsumFilepath, bsdStyle, verbose)
+	i = searchDir(givenPath, &dict, xxhsumFilepath, bsdStyle, verbose)
 	if !verbose {
 		s.Stop()
 	}
+
+	log.Printf("Hashes added %d\n", i)
 }
