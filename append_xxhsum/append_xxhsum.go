@@ -79,20 +79,20 @@ func searchDir(root string, dict map[string]string, xxhsumFilepath string, bsdSt
 	}
 }
 
+func calculateLine(bsdStyle bool, relPath string, checksum string) string {
+	if bsdStyle {
+		return fmt.Sprintf("XXH64 (%s) = %s\n", relPath, checksum)
+	} else {
+		return fmt.Sprintf("%s  %s\n", checksum, relPath)
+	}
+}
+
 func emitLine(xxhsumFilepath string, line string, verbose bool) {
 	if err := appendToFile(xxhsumFilepath, line); err != nil {
 		log.Printf("error appending to file %s; skipping %v\n", xxhsumFilepath, err)
 	}
 	if verbose {
 		fmt.Print(line)
-	}
-}
-
-func calculateLine(bsdStyle bool, relPath string, checksum string) string {
-	if bsdStyle {
-		return fmt.Sprintf("XXH64 (%s) = %s\n", relPath, checksum)
-	} else {
-		return fmt.Sprintf("%s  %s\n", checksum, relPath)
 	}
 }
 
