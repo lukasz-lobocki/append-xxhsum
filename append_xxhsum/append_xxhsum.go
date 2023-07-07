@@ -30,15 +30,6 @@ const (
 	White  string = "\033[97m"
 )
 
-func flagSetup(verbose bool, bsdStyle bool, xxhsumFilepath string) {
-	flag.BoolVar(&verbose, "verbose", false, "increase the verbosity.")
-	flag.BoolVar(&verbose, "v", false, "increase the verbosity.")
-	flag.BoolVar(&bsdStyle, "bsd-style", false, "BSD-style checksum lines.")
-	flag.BoolVar(&bsdStyle, "b", false, "BSD-style checksum lines.")
-	flag.StringVar(&xxhsumFilepath, "xxhsum-filepath", "", "FILEPATH to file to append to.")
-	flag.StringVar(&xxhsumFilepath, "x", "", "FILEPATH to file to append to.")
-}
-
 func debugVariables(verbose bool, givenPath string, parentPath string, xxhsumFilepath string, xxhsumFileExists bool) {
 	log.Printf(YELLOW+"DEBUG"+RESET+" given_path=%v\n", givenPath)
 	log.Printf(YELLOW+"DEBUG"+RESET+" parent_dir=%v\n", parentPath)
@@ -191,7 +182,13 @@ func main() {
 	/*
 		Parsing input
 	*/
-	flagSetup(verbose, bsdStyle, xxhsumFilepath)
+
+	flag.BoolVar(&verbose, "verbose", false, "increase the verbosity.")
+	flag.BoolVar(&verbose, "v", false, "increase the verbosity.")
+	flag.BoolVar(&bsdStyle, "bsd-style", false, "BSD-style checksum lines.")
+	flag.BoolVar(&bsdStyle, "b", false, "BSD-style checksum lines.")
+	flag.StringVar(&xxhsumFilepath, "xxhsum-filepath", "", "FILEPATH to file to append to.")
+	flag.StringVar(&xxhsumFilepath, "x", "", "FILEPATH to file to append to.")
 	flag.Parse()
 
 	/*
