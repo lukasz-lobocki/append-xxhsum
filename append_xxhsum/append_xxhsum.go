@@ -154,8 +154,14 @@ func init() {
 }
 
 type configStru struct {
-	verbose  string
-	bsdStyle string
+	verbose  bool
+	bsdStyle bool
+}
+
+type pathsStru struct {
+	xxhsumFileExists bool
+	xxhsumFilepath   string
+	givenPath        string
 }
 
 func main() {
@@ -173,8 +179,8 @@ func main() {
 
 	defer func() { dict = nil }()
 
-	config := configStru{verbose: "DUPex", bsdStyle: ""}
-	log.Printf("DUPA %v %v", config.verbose, &config.bsdStyle)
+	config := configStru{verbose: false, bsdStyle: false}
+	log.Printf("DiUPA %v %v", &config.verbose, &config.bsdStyle)
 
 	/*
 		Parsing input
