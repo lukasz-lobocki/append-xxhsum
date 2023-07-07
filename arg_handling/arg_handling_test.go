@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func Test_expand_tilde(t *testing.T) {
+func Test_expandTilde(t *testing.T) {
 	type args struct {
 		in_path string
 	}
@@ -31,7 +31,7 @@ func Test_expand_tilde(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := expand_tilde(tt.args.in_path)
+			got, err := expandTilde(tt.args.in_path)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("expand_tilde() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -43,7 +43,7 @@ func Test_expand_tilde(t *testing.T) {
 	}
 }
 
-func TestArg_parse(t *testing.T) {
+func TestArgParse(t *testing.T) {
 	type args struct {
 		arg     string
 		verbose bool
@@ -65,7 +65,7 @@ func TestArg_parse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Arg_parse(tt.args.arg, tt.args.verbose)
+			got, err := ArgParse(tt.args.arg, tt.args.verbose)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Arg_parse() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -77,7 +77,7 @@ func TestArg_parse(t *testing.T) {
 	}
 }
 
-func TestParam_parse(t *testing.T) {
+func TestParamParse(t *testing.T) {
 	type args struct {
 		param   string
 		verbose bool
@@ -100,7 +100,7 @@ func TestParam_parse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1, err := Param_parse(tt.args.param, tt.args.verbose)
+			got, got1, err := ParamParse(tt.args.param, tt.args.verbose)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Param_parse() error = %v, wantErr %v", err, tt.wantErr)
 				return

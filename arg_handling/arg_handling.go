@@ -25,7 +25,7 @@ Parameters:
 -h, --help                      show this help message and exit.
 `
 
-func Arg_parse(arg string, verbose bool) (string, error) {
+func ArgParse(arg string, verbose bool) (string, error) {
 	// PATH
 
 	var (
@@ -53,7 +53,7 @@ func Arg_parse(arg string, verbose bool) (string, error) {
 	return dir_path, nil
 }
 
-func Param_parse(param string, verbose bool) (string, bool, error) {
+func ParamParse(param string, verbose bool) (string, bool, error) {
 	// xxhsum-filepath
 
 	var (
@@ -61,7 +61,7 @@ func Param_parse(param string, verbose bool) (string, bool, error) {
 		file_path string = ""
 	)
 
-	param, err = expand_tilde(param)
+	param, err = expandTilde(param)
 	if err != nil {
 		return "", false, err
 	}
@@ -87,7 +87,7 @@ func Param_parse(param string, verbose bool) (string, bool, error) {
 	}
 }
 
-func expand_tilde(in_path string) (string, error) {
+func expandTilde(in_path string) (string, error) {
 
 	if !strings.HasPrefix(in_path, "~") {
 		return filepath.Clean(in_path), nil

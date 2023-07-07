@@ -45,7 +45,7 @@ func Test_append_to_file(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := append_to_file(tt.args.filename, tt.args.content); (err != nil) != tt.wantErr {
+			if err := appendToFile(tt.args.filename, tt.args.content); (err != nil) != tt.wantErr {
 				t.Errorf("append_to_file() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
