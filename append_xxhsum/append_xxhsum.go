@@ -13,21 +13,10 @@ import (
 	"time"
 	"xxhsum/arg_handling"
 	"xxhsum/dictionar"
+	"xxhsum/globals"
 
 	"github.com/briandowns/spinner"
 	"github.com/cespare/xxhash/v2"
-)
-
-const (
-	RESET  string = "\033[0m"
-	RED    string = "\033[31m"
-	GREEN  string = "\033[32m"
-	YELLOW string = "\033[33m"
-	BLUE   string = "\033[34m"
-	PURPLE string = "\033[35m"
-	CYAN   string = "\033[36m"
-	GRAY   string = "\033[37m"
-	WHITE  string = "\033[97m"
 )
 
 func searchDir(root string, dict map[string]string, xxhsumFilepath string, bsdStyle bool, verbose bool) {
@@ -56,7 +45,7 @@ func searchDir(root string, dict map[string]string, xxhsumFilepath string, bsdSt
 			if _, ok := dict[rel_path]; ok {
 				// Found
 				if verbose {
-					log.Printf(GREEN+"INFO"+RESET+" %s exists; skipping\n", rel_path)
+					log.Printf(globals.GREEN+"INFO"+globals.RESET+" %s exists; skipping\n", rel_path)
 				}
 			} else {
 				// Not found
@@ -153,9 +142,9 @@ func appendToFile(filename string, content string) error {
 }
 
 func debugVariables(verbose bool, givenPath string, xxhsumFilepath string, xxhsumFileExists bool) {
-	log.Printf(YELLOW+"DEBUG"+RESET+" given_path=%v\n", givenPath)
-	log.Printf(YELLOW+"DEBUG"+RESET+" xxhsum-path=%v\n", xxhsumFilepath)
-	log.Printf(YELLOW+"DEBUG"+RESET+" xxhsum-path exists=%t\n", xxhsumFileExists)
+	log.Printf(globals.YELLOW+"DEBUG"+globals.RESET+" given_path=%v\n", givenPath)
+	log.Printf(globals.YELLOW+"DEBUG"+globals.RESET+" xxhsum-path=%v\n", xxhsumFilepath)
+	log.Printf(globals.YELLOW+"DEBUG"+globals.RESET+" xxhsum-path exists=%t\n", xxhsumFileExists)
 }
 
 func init() {
@@ -164,20 +153,28 @@ func init() {
 	flag.Usage = func() { fmt.Printf(arg_handling.Usage, filepath.Base(os.Args[0])) }
 }
 
+type configStru struct {
+	verbose  string
+	bsdStyle string
+}
+
 func main() {
 
 	var (
 		verbose          bool              = false
 		bsdStyle         bool              = false
+		xxhsumFileExists bool              = false
 		xxhsumFilepath   string            = ""
 		givenPath        string            = ""
 		dict             map[string]string = nil
-		xxhsumFileExists bool              = false
 		err              error             = nil
 		s                *spinner.Spinner  = nil
 	)
 
 	defer func() { dict = nil }()
+
+	config := configStru{verbose: "DUPex", bsdStyle: ""}
+	log.Printf("DUPA %v %v", config.verbose, &config.bsdStyle)
 
 	/*
 		Parsing input
@@ -194,12 +191,12 @@ func main() {
 		Parsing PATH argument for given_path
 	*/
 	if flag.NArg() != 1 {
-		log.Fatalln(RED + "PATH agrument missing." + RESET)
+		log.Fatalln(globals.RED + "PATH agrument missing." + globals.RESET)
 	}
 
 	givenPath, err = arg_handling.ArgParse(flag.Arg(0), verbose)
 	if err != nil {
-		log.Fatalf(RED+"%s"+RESET, err)
+		log.Fatalf(globals.RED+"%s"+globals.RESET, err)
 	}
 
 	/*
@@ -214,7 +211,7 @@ func main() {
 
 	xxhsumFilepath, xxhsumFileExists, err = arg_handling.ParamParse(xxhsumFilepath, verbose)
 	if err != nil {
-		log.Fatalf(RED+"%s"+RESET, err)
+		log.Fatalf(globals.RED+"%s"+globals.RESET, err)
 	}
 
 	/*
@@ -235,7 +232,7 @@ func main() {
 		s.Stop()
 
 		if err != nil {
-			log.Fatalf(RED+"%s"+RESET, err)
+			log.Fatalf(globals.RED+"%s"+globals.RESET, err)
 		}
 
 		if verbose {
