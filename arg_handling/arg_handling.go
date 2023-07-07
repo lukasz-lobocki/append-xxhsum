@@ -87,10 +87,10 @@ func ParamParse(param string, verbose bool) (string, bool, error) {
 	}
 }
 
-func expandTilde(in_path string) (string, error) {
+func expandTilde(inputPath string) (string, error) {
 
-	if !strings.HasPrefix(in_path, "~") {
-		return filepath.Clean(in_path), nil
+	if !strings.HasPrefix(inputPath, "~") {
+		return filepath.Clean(inputPath), nil
 	}
 
 	if usr, err := user.Current(); err != nil {
@@ -100,17 +100,17 @@ func expandTilde(in_path string) (string, error) {
 			return "", fmt.Errorf("no homedir; %w", err)
 		} else {
 			switch true {
-			case in_path == "~":
+			case inputPath == "~":
 				{
 					return dir, nil
 				}
-			case strings.HasPrefix(in_path, "~/"):
+			case strings.HasPrefix(inputPath, "~/"):
 				{
-					return filepath.Join(dir, in_path[2:]), nil
+					return filepath.Join(dir, inputPath[2:]), nil
 				}
 			default:
 				{
-					return "", fmt.Errorf("error resolving filepath: %s", in_path)
+					return "", fmt.Errorf("error resolving filepath: %s", inputPath)
 				}
 			}
 		}
