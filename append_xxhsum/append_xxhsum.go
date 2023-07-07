@@ -152,7 +152,6 @@ func debugVariables(verbose bool, givenPath string, xxhsumFilepath string, xxhsu
 }
 
 func init() {
-	//log.SetPrefix(filepath.Base(os.Args[0] + " "))
 	log.SetFlags(0)
 	flag.Usage = func() { fmt.Printf(arg_handling.Usage, filepath.Base(os.Args[0])) }
 }
