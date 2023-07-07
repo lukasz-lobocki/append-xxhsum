@@ -9,6 +9,18 @@ import (
 	"strings"
 )
 
+const (
+	RESET  string = "\033[0m"
+	RED    string = "\033[31m"
+	GREEN  string = "\033[32m"
+	YELLOW string = "\033[33m"
+	BLUE   string = "\033[34m"
+	PURPLE string = "\033[35m"
+	CYAN   string = "\033[36m"
+	GRAY   string = "\033[37m"
+	WHITE  string = "\033[97m"
+)
+
 func LoadXXHSumFile(inputFile string, bsdStyle bool) (map[string]string, error) {
 
 	var (
@@ -92,6 +104,6 @@ func loadBSDStyleLine(line string, data map[string]string) {
 func DumpXXHSumDict(inputData map[string]string) {
 	// Print the dictionary contents
 	for key, value := range inputData {
-		log.Printf("DUMP %s  %s\n", value, key)
+		log.Printf(BLUE+"DUMP"+RESET+" %s  %s\n", value, key)
 	}
 }

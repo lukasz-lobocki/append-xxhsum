@@ -23,19 +23,12 @@ const (
 	RED    string = "\033[31m"
 	GREEN  string = "\033[32m"
 	YELLOW string = "\033[33m"
-	Blue   string = "\033[34m"
-	Purple string = "\033[35m"
-	Cyan   string = "\033[36m"
-	Gray   string = "\033[37m"
-	White  string = "\033[97m"
+	BLUE   string = "\033[34m"
+	PURPLE string = "\033[35m"
+	CYAN   string = "\033[36m"
+	GRAY   string = "\033[37m"
+	WHITE  string = "\033[97m"
 )
-
-func debugVariables(verbose bool, givenPath string, parentPath string, xxhsumFilepath string, xxhsumFileExists bool) {
-	log.Printf(YELLOW+"DEBUG"+RESET+" given_path=%v\n", givenPath)
-	log.Printf(YELLOW+"DEBUG"+RESET+" parent_dir=%v\n", parentPath)
-	log.Printf(YELLOW+"DEBUG"+RESET+" xxhsum-path=%v\n", xxhsumFilepath)
-	log.Printf(YELLOW+"DEBUG"+RESET+" xxhsum-path exists=%t\n", xxhsumFileExists)
-}
 
 func searchDir(root string, dict map[string]string, xxhsumFilepath string, bsdStyle bool, verbose bool) {
 
@@ -159,6 +152,13 @@ func appendToFile(filename string, content string) error {
 	return file.Close()
 }
 
+func debugVariables(verbose bool, givenPath string, parentPath string, xxhsumFilepath string, xxhsumFileExists bool) {
+	log.Printf(YELLOW+"DEBUG"+RESET+" given_path=%v\n", givenPath)
+	log.Printf(YELLOW+"DEBUG"+RESET+" parent_dir=%v\n", parentPath)
+	log.Printf(YELLOW+"DEBUG"+RESET+" xxhsum-path=%v\n", xxhsumFilepath)
+	log.Printf(YELLOW+"DEBUG"+RESET+" xxhsum-path exists=%t\n", xxhsumFileExists)
+}
+
 func init() {
 	log.SetPrefix(filepath.Base(os.Args[0] + " "))
 	log.SetFlags(0)
@@ -179,10 +179,11 @@ func main() {
 		s                *spinner.Spinner  = nil
 	)
 
+	defer func() { dict = nil }()
+
 	/*
 		Parsing input
 	*/
-
 	flag.BoolVar(&verbose, "verbose", false, "increase the verbosity.")
 	flag.BoolVar(&verbose, "v", false, "increase the verbosity.")
 	flag.BoolVar(&bsdStyle, "bsd-style", false, "BSD-style checksum lines.")
@@ -261,6 +262,4 @@ func main() {
 	if !verbose {
 		s.Stop()
 	}
-
-	dict = nil
 }
