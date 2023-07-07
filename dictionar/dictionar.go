@@ -35,10 +35,10 @@ func LoadXXHSumFile(inputFile string, bsdStyle bool) (map[string]string, error) 
 
 		if bsdStyle {
 			// Load BSD-style line
-			loadBSDStyleLine(line, data)
+			loadBSDStyleLine(line, &data)
 		} else {
 			// Load GNU-style line
-			loadGNUStyleLine(line, data)
+			loadGNUStyleLine(line, &data)
 		}
 	}
 
@@ -50,16 +50,16 @@ func LoadXXHSumFile(inputFile string, bsdStyle bool) (map[string]string, error) 
 	return data, nil
 }
 
-func loadGNUStyleLine(line string, data map[string]string) {
+func loadGNUStyleLine(line string, data *map[string]string) {
 	parts := strings.Split(line, "  ")
 	if len(parts) == 2 {
 		fileName := strings.TrimSpace(parts[1])
 		hashValue := strings.TrimSpace(parts[0])
-		data[fileName] = hashValue
+		(*data)[fileName] = hashValue
 	}
 }
 
-func loadBSDStyleLine(line string, data map[string]string) {
+func loadBSDStyleLine(line string, data *map[string]string) {
 	pattern := `^(\w+)\s*\((.*?)\)\s*=\s*(\w+)$`
 	/*
 		^ asserts the start of the line.
@@ -85,7 +85,7 @@ func loadBSDStyleLine(line string, data map[string]string) {
 		fileName := match[2]
 		hashValue := match[3]
 		if algoName == "XXH64" {
-			data[fileName] = hashValue
+			(*data)[fileName] = hashValue
 		}
 	}
 }
