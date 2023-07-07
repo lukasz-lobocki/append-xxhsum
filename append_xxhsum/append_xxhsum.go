@@ -152,9 +152,8 @@ func appendToFile(filename string, content string) error {
 	return file.Close()
 }
 
-func debugVariables(verbose bool, givenPath string, parentPath string, xxhsumFilepath string, xxhsumFileExists bool) {
+func debugVariables(verbose bool, givenPath string, xxhsumFilepath string, xxhsumFileExists bool) {
 	log.Printf(YELLOW+"DEBUG"+RESET+" given_path=%v\n", givenPath)
-	log.Printf(YELLOW+"DEBUG"+RESET+" parent_dir=%v\n", parentPath)
 	log.Printf(YELLOW+"DEBUG"+RESET+" xxhsum-path=%v\n", xxhsumFilepath)
 	log.Printf(YELLOW+"DEBUG"+RESET+" xxhsum-path exists=%t\n", xxhsumFileExists)
 }
@@ -172,7 +171,6 @@ func main() {
 		bsdStyle         bool              = false
 		xxhsumFilepath   string            = ""
 		givenPath        string            = ""
-		parentPath       string            = ""
 		dict             map[string]string = nil
 		xxhsumFileExists bool              = false
 		err              error             = nil
@@ -204,8 +202,6 @@ func main() {
 		log.Fatalf(RED+"%s"+RESET, err)
 	}
 
-	parentPath = filepath.Dir(givenPath)
-
 	/*
 		Parsing parameter xxhsum-filepath
 	*/
@@ -225,7 +221,7 @@ func main() {
 		Doing the do
 	*/
 	if verbose {
-		debugVariables(verbose, givenPath, parentPath, xxhsumFilepath, xxhsumFileExists)
+		debugVariables(verbose, givenPath, xxhsumFilepath, xxhsumFileExists)
 	}
 
 	if xxhsumFileExists {
