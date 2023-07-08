@@ -34,7 +34,7 @@ func LoadXXHSumFile(inputFile string, bsdStyle bool) (map[string]string, error) 
 
 		if bsdStyle {
 			// Load BSD-style line
-			loadLine(line, `^XXH64\s*\((?P<fileName>.*)\)\s*=\s*(?P<hashValue>\w+)$`, &data)
+			loadLine(line, `^XXH64\s*\((?P<fileName>.*)\)\s*=\s*(?P<hashValue>\w+)$`, data)
 			/*
 				^ asserts the start of the line.
 				(\w+) captures one or more word characters as the algorithm name.
@@ -52,7 +52,7 @@ func LoadXXHSumFile(inputFile string, bsdStyle bool) (map[string]string, error) 
 			*/
 		} else {
 			// Load GNU-style line
-			loadLine(line, `^(?P<hashValue>.*?)  (?P<fileName>.*)$`, &data)
+			loadLine(line, `^(?P<hashValue>.*?)  (?P<fileName>.*)$`, data)
 			/*
 				^ asserts the start of the line.
 				(.*?) captures any characters (except newline characters) lazily in the first group. The ? makes the * quantifier non-greedy
@@ -72,7 +72,7 @@ func LoadXXHSumFile(inputFile string, bsdStyle bool) (map[string]string, error) 
 	return data, nil
 }
 
-func loadLine(line string, pattern string, data *map[string]string) {
+func loadLine(line string, pattern string, data map[string]string) {
 
 	regex := regexp.MustCompile(pattern)
 	matches := regex.FindStringSubmatch(line)
@@ -84,13 +84,13 @@ func loadLine(line string, pattern string, data *map[string]string) {
 		for i, match := range matches {
 			result[groupNames[i]] = match
 		}
-		(*data)[result["fileName"]] = result["hashValue"]
+		data[result["fileName"]] = result["hashValue"]
 	}
 }
 
-func DumpXXHSumDict(inputData *map[string]string) {
+func DumpXXHSumDict(inputData map[string]string) {
 	// Print the dictionary contents
-	for key, value := range *inputData {
+	for key, value := range inputData {
 		log.Printf(globals.BLUE+"DUMP"+globals.RESET+" %s  %s\n", value, key)
 	}
 }

@@ -18,7 +18,7 @@ func TestDumpXXHSumDict(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			DumpXXHSumDict(&tt.args.in_data)
+			DumpXXHSumDict(tt.args.in_data)
 		})
 	}
 }

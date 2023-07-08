@@ -19,7 +19,7 @@ import (
 	"github.com/cespare/xxhash/v2"
 )
 
-func searchDir(root string, dict *map[string]string, xxhsumFilepath string, bsdStyle bool, verbose bool) int {
+func searchDir(root string, dict map[string]string, xxhsumFilepath string, bsdStyle bool, verbose bool) int {
 
 	var (
 		line string
@@ -43,7 +43,7 @@ func searchDir(root string, dict *map[string]string, xxhsumFilepath string, bsdS
 		} else {
 			rel_path = "./" + rel_path
 
-			if _, ok := (*dict)[rel_path]; ok {
+			if _, ok := dict[rel_path]; ok {
 				// Found
 				if verbose {
 					log.Printf(globals.GREEN+"INFO"+globals.RESET+" %s exists; skipping\n", rel_path)
@@ -235,7 +235,7 @@ func main() {
 			/*
 				Dump xxhsum_file dictionary
 			*/
-			dictionar.DumpXXHSumDict(&dict)
+			dictionar.DumpXXHSumDict(dict)
 		}
 	}
 
@@ -247,7 +247,7 @@ func main() {
 	if !verbose {
 		s.Start()
 	}
-	i = searchDir(givenPath, &dict, xxhsumFilepath, bsdStyle, verbose)
+	i = searchDir(givenPath, dict, xxhsumFilepath, bsdStyle, verbose)
 	if !verbose {
 		s.Stop()
 	}
