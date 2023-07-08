@@ -75,9 +75,8 @@ func searchDir(root string, dict map[string]string, xxhsumFilepath string, bsdSt
 func calculateLine(bsdStyle bool, relPath string, checksum string) string {
 	if bsdStyle {
 		return fmt.Sprintf("XXH64 (%s) = %s\n", relPath, checksum)
-	} else {
-		return fmt.Sprintf("%s  %s\n", checksum, relPath)
 	}
+	return fmt.Sprintf("%s  %s\n", checksum, relPath)
 }
 
 func emitLine(xxhsumFilepath string, line string, verbose bool) {
