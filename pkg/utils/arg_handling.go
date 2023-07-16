@@ -28,7 +28,7 @@ Parameters:
 
 To verify use xxhsum --check --quiet FILEPATH
 
-version: %s commit: %s built: %s
+version: %s
 `
 
 // Parses PATH part of program invocation.
