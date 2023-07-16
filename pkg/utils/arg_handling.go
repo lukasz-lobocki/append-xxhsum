@@ -20,7 +20,7 @@ Arguments:
 PATH                            PATH to analyze
 
 Parameters:
--x, --xxhsum-filepath           FILEPATH of file to append to
+-x, --xxhsum-filepath           FILEPATH of file to append to. Defaults to PATH\..\DIRNAME.xxhsum
 -b, --bsd-style                 BSD-style checksum lines. Defaults to GNU-style
 -v, --verbose                   increase the verbosity of the bash script
 -h, --help                      show this help message and exit
