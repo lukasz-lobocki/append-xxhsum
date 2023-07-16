@@ -30,7 +30,7 @@ append-xxhsum [--xxhsum-filepath FILEPATH] \
 <summary>Test run</summary>
 
 ```bash
-cd ~/Pictures \
+pushd ~/Pictures \
   && time ~/Code/golang/append-xxhsum/bin/append-xxhsum-amd64 ../Code
 ```
 
