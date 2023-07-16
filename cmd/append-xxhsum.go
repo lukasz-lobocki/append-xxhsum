@@ -65,8 +65,7 @@ func searchDir(root string, dict map[string]string, xxhsumFilepath string, bsdSt
 					line = calculateLine(bsdStyle, rel_path, checksum)
 
 					// Emit line
-					emitLine(xxhsumFilepath, line, verbose)
-					i++
+					i = i + emitLine(xxhsumFilepath, line, verbose)
 				}
 			}
 		}
@@ -89,13 +88,16 @@ func calculateLine(bsdStyle bool, relPath string, checksum string) string {
 }
 
 // Outputs a line.
-func emitLine(xxhsumFilepath string, line string, verbose bool) {
-	if err := appendToFile(xxhsumFilepath, line); err != nil {
-		log.Printf("error appending to file %s; skipping %v\n", xxhsumFilepath, err)
-	}
+func emitLine(xxhsumFilepath string, line string, verbose bool) (linesEmited int) {
 	if verbose {
 		fmt.Print(line)
 	}
+	if err := appendToFile(xxhsumFilepath, line); err != nil {
+		log.Printf("error appending to file %s; skipping %v\n", xxhsumFilepath, err)
+	} else {
+		linesEmited = 1
+	}
+	return
 }
 
 // Outputs if parameter is directory or symbolic-link.
@@ -255,6 +257,12 @@ func main() {
 				Dump xxhsum_file dictionary
 			*/
 			utils.DumpXXHSumDict(dict)
+		}
+	} else {
+		// Create a GNU-style file with heading comment.
+		if !bsdStyle {
+			appendToFile(xxhsumFilepath, "# XXH64 hashes https://xxhash.com/\n")
+			appendToFile(xxhsumFilepath, "# To verify use xxhsum --check --quiet -\n")
 		}
 	}
 
