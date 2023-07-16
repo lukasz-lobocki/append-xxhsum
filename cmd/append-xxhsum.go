@@ -88,14 +88,14 @@ func calculateLine(bsdStyle bool, relPath string, checksum string) string {
 }
 
 // Outputs a line.
-func emitLine(xxhsumFilepath string, line string, verbose bool) (linesEmited int) {
+func emitLine(xxhsumFilepath string, line string, verbose bool) (linesEmitted int) {
 	if verbose {
 		fmt.Print(line)
 	}
 	if err := appendToFile(xxhsumFilepath, line); err != nil {
 		log.Printf("error appending to file %s; skipping %v\n", xxhsumFilepath, err)
 	} else {
-		linesEmited = 1
+		linesEmitted = 1
 	}
 	return
 }
