@@ -1,0 +1,3 @@
+bin/*
+append-xxhsum.code-workspace
+tst/test3.xx_append
