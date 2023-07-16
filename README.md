@@ -33,6 +33,7 @@ append-xxhsum [--xxhsum-filepath FILEPATH] \
 cd ~/Pictures \
   && time ~/Code/golang/append-xxhsum/bin/append-xxhsum-amd64 ../Code
 ```
+
 </details>
 
 <details>
