@@ -13,9 +13,7 @@ for i in "${goarchs[@]}"; do
   export GOARCH=${i}
   rm ../bin/append-xxhsum-"${GOARCH}"
   go build \
-    -ldflags="-X 'main.version=$(git describe --abbrev=0 --tags)' \
-      -X 'main.buildTime=$(date)' \
-      -X 'main.gitCommit=$(git rev-parse --short HEAD)' \
+    -ldflags="-X 'main.version=$(git describe --abbrev=0 --tags)-$(git rev-parse --short HEAD).$(date -u '+%Y%m%dT%H%M%SZ')+${GOARCH}' \
       -s -w" \
     -o ../bin/append-xxhsum-"${GOARCH}" \
   .

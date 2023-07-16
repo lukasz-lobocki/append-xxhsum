@@ -20,10 +20,6 @@ import (
 var (
 	// Version numer shown in help message.
 	version string = "development"
-	// Git last commit ID shown in help message.
-	gitCommit string = ""
-	// Time of build shown in help message.
-	buildTime string = ""
 )
 
 // Walks the directory and adds hashes, missing in the map, to the file.
@@ -169,7 +165,7 @@ func debugVariables(verbose bool, givenPath string, xxhsumFilepath string, xxhsu
 // Sets up initial the program environment.
 func init() {
 	log.SetFlags(0)
-	flag.Usage = func() { fmt.Printf(utils.Usage, filepath.Base(os.Args[0]), version, gitCommit, buildTime) }
+	flag.Usage = func() { fmt.Printf(utils.Usage, filepath.Base(os.Args[0]), version) }
 }
 
 // Main routine.

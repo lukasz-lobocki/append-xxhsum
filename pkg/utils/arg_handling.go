@@ -26,7 +26,9 @@ Parameters:
 -d, --debug                     show debug information
 -h, --help                      show this help message and exit
 
-version: %s commit: %s built: %s
+To verify use xxhsum --check --quiet FILEPATH
+
+version: %s
 `
 
 // Parses PATH part of program invocation.
