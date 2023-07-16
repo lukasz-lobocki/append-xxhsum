@@ -175,6 +175,7 @@ func main() {
 
 	var (
 		verbose          bool              = false
+		debug            bool              = false
 		bsdStyle         bool              = false
 		xxhsumFileExists bool              = false
 		xxhsumFilepath   string            = ""
@@ -192,6 +193,8 @@ func main() {
 	*/
 	flag.BoolVar(&verbose, "verbose", false, "increase the verbosity.")
 	flag.BoolVar(&verbose, "v", false, "increase the verbosity.")
+	flag.BoolVar(&debug, "debug", false, "show debug information.")
+	flag.BoolVar(&debug, "d", false, "show debug information.")
 	flag.BoolVar(&bsdStyle, "bsd-style", false, "BSD-style checksum lines.")
 	flag.BoolVar(&bsdStyle, "b", false, "BSD-style checksum lines.")
 	flag.StringVar(&xxhsumFilepath, "xxhsum-filepath", "", "FILEPATH to file to append to.")
@@ -228,7 +231,7 @@ func main() {
 	/*
 		Doing the do
 	*/
-	if verbose {
+	if debug {
 		debugVariables(verbose, givenPath, xxhsumFilepath, xxhsumFileExists)
 	}
 
