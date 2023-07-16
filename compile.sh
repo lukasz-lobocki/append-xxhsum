@@ -11,6 +11,7 @@ pushd ~/Code/golang/append-xxhsum/cmd > /dev/null || exit
 
 for i in "${goarchs[@]}"; do
   export GOARCH=${i}
+  rm ../bin/append-xxhsum-"${GOARCH}"
   go build \
     -ldflags="-X 'main.version=$(git describe --abbrev=0 --tags)' \
       -X 'main.buildTime=$(date)' \
