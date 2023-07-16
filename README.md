@@ -26,6 +26,8 @@ append-xxhsum [--xxhsum-filepath FILEPATH] \
 | -d | --debug | show debug information |
 | -h | --help | show this help message and exit |
 
+To verify use `xxhsum --check --quiet FILEPATH`
+
 <details>
 <summary>Test run</summary>
 

@@ -258,7 +258,7 @@ func main() {
 		// Create a GNU-style file with heading comment.
 		if !bsdStyle {
 			appendToFile(xxhsumFilepath, "# XXH64 hashes https://xxhash.com/\n")
-			appendToFile(xxhsumFilepath, "# To verify use xxhsum --check --quiet -\n")
+			appendToFile(xxhsumFilepath, "# To verify use xxhsum --check --quiet FILEPATH\n")
 		}
 	}
 
