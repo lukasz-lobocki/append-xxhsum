@@ -27,6 +27,6 @@ done
 cp ../bin/append-xxhsum-"$(dpkg --print-architecture)" ../bin/append-xxhsum
 
 # Remote copy arm64 build to nextcloudpi
-scp ../bin/append-xxhsum-arm64 la_lukasz@nextcloudpi.local:./tmp/append-xxhsum
+scp ./bin/append-xxhsum-arm64 la_lukasz@nextcloudpi.local:./tmp/append-xxhsum
 
 popd > /dev/null || exit
