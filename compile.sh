@@ -26,4 +26,7 @@ done
 # For your local architecture, create default file without architecture name
 cp ../bin/append-xxhsum-"$(dpkg --print-architecture)" ../bin/append-xxhsum
 
+# Remote copy arm64 build to nextcloudpi
+scp ../bin/append-xxhsum-arm64 la_lukasz@nextcloudpi.local:./tmp/append-xxhsum
+
 popd > /dev/null || exit
