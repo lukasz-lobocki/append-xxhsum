@@ -45,8 +45,6 @@ func searchDir(root string, dict map[string]string, xxhsumFilepath string, bsdSt
 		if rel_path, err := filepath.Rel(filepath.Dir(xxhsumFilepath), path); err != nil {
 			log.Printf("error resolving relative path; skipping %v\n", err)
 		} else {
-			rel_path = "./" + rel_path
-
 			if _, ok := dict[rel_path]; ok {
 				// Found
 				if verbose {
