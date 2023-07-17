@@ -203,7 +203,7 @@ func main() {
 		Parsing PATH argument for given_path
 	*/
 	if flag.NArg() != 1 {
-		log.Fatalln(utils.RED + "PATH agrument missing" + utils.RESET)
+		log.Fatalln(utils.RED + "PATH agrument missing or ambiguous" + utils.RESET)
 	}
 
 	givenPath, err = utils.ArgParse(flag.Arg(0), verbose)
@@ -241,7 +241,9 @@ func main() {
 			spinner.WithSuffix(" Loading existing xxhsum file"),
 			spinner.WithFinalMSG(fmt.Sprintf("Loading existing %s xxhsum file complete\n", xxhsumFilepath)))
 		s.Start()
+
 		dict, err = utils.LoadXXHSumFile(xxhsumFilepath, bsdStyle)
+
 		s.Stop()
 
 		if err != nil {
@@ -271,10 +273,12 @@ func main() {
 	if !verbose {
 		s.Start()
 	}
+
 	i = searchDir(givenPath, dict, xxhsumFilepath, bsdStyle, verbose)
+
 	if !verbose {
 		s.Stop()
 	}
 
-	log.Printf("Hashes added %d\n", i)
+	log.Printf("%d xxhashes appended to %s\n", i, xxhsumFilepath)
 }
