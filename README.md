@@ -6,7 +6,7 @@ Recursively adds missing xxhsum (XXH64) hashes from PATH to --xxhsum-filepath.
 
 ```bash
 append-xxhsum [--xxhsum-filepath FILEPATH] \
-  [--bsd-style] [--verbose] [--help] \
+  [--bsd-style] [--verbose] [--debug] [--help] \
   PATH
 ```
 
