@@ -12,19 +12,19 @@ import (
 
 // Text of help.
 const Usage string = `
-Usage: %s [--xxhsum-filepath FILEPATH] [--bsd-style] [--verbose] [--help] PATH
+Usage: %s [--xxhsum-filepath FILEPATH] [--bsd-style] [--verbose] [--debug] [--help] PATH
 
 Recursively adds missing xxhsum (XXH64) hashes from PATH to --xxhsum-filepath.
 
 Arguments:
-PATH                            PATH to analyze
+  PATH                     PATH to analyze
 
 Parameters:
--x, --xxhsum-filepath           FILEPATH of file to append to. Defaults to PATH\..\DIRNAME.xxhsum
--b, --bsd-style                 BSD-style checksum lines. Defaults to GNU-style
--v, --verbose                   increase the verbosity
--d, --debug                     show debug information
--h, --help                      show this help message and exit
+  -x, --xxhsum-filepath    FILEPATH of file to append to. Defaults to PATH\..\DIRNAME.xxhsum
+  -b, --bsd-style          BSD-style checksum lines. Defaults to GNU-style
+  -v, --verbose            increase the verbosity
+  -d, --debug              show debug information
+  -h, --help               show this help message and exit
 
 To verify use xxhsum --check --quiet FILEPATH
 
