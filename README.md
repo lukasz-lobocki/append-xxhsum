@@ -1,4 +1,4 @@
-![Static Badge](https://img.shields.io/badge/heu_mambryma-membrama-blue?style=for-the-badge&logoColor=google&labelColor=yellow)
+![Static Badge](https://img.shields.io/badge/heu_mambryma-membrama-navy?style=for-the-badge&labelColor=gold)
 
 # append-xxhsum
 
