@@ -1,3 +1,5 @@
+![Static Badge](https://img.shields.io/badge/heu_mambryma-membrama-blue?style=for-the-badge&logoColor=google&labelColor=yellow)
+
 # append-xxhsum
 
 Recursively adds missing xxhsum (XXH64) hashes from PATH to --xxhsum-filepath.
