@@ -16,18 +16,18 @@ import (
 	"github.com/lukasz-lobocki/append-xxhsum/pkg/utils"
 )
 
-// To be updated with -ldflags during compilation.
+// `version` is updated with `-ldflags` during compilation.
 var (
 	// Version numer shown in help message.
 	version string = "development"
 )
 
-// Walks the directory and adds hashes, missing in the map, to the file.
+// `searchDir` walks the `root` directory and adds hashes, missing in the `dict`, to the `xxhsumFilepath` file.
 func searchDir(root string, dict map[string]string, xxhsumFilepath string, bsdStyle bool, verbose bool) int {
 
 	var (
-		line string
-		i    int
+		line string // `line` contains string to be appended to the `xxhsumFilepath` file.
+		i    int    // `int` counts the number of additions.
 	)
 
 	err := filepath.WalkDir(root, func(path string, di fs.DirEntry, err error) error {
@@ -36,7 +36,7 @@ func searchDir(root string, dict map[string]string, xxhsumFilepath string, bsdSt
 			return nil
 		}
 
-		// Skip directories and symbolic links
+		// Skip directories and symbolic links.
 		shouldReturn, returnValue := skipDirs(di)
 		if shouldReturn {
 			return returnValue
@@ -46,19 +46,19 @@ func searchDir(root string, dict map[string]string, xxhsumFilepath string, bsdSt
 			log.Printf("error resolving relative path; skipping %v\n", err)
 		} else {
 			if _, ok := dict[rel_path]; ok {
-				// Found
+				// `rel_path` key already found in `dict`. Do nothing.
 				if verbose {
 					log.Printf(utils.GREEN+"INFO"+utils.RESET+" %s exists; skipping\n", rel_path)
 				}
 			} else {
-				// Not found
+				// `rel_path` key missing from `dict`. Append. an entry.
 				if checksum, err := calculateXXHash(path); err != nil {
 					log.Printf("error calculating xxHash: %v\n", err)
 				} else {
-					// Calculate line
+					// Calculate the line to be appended.
 					line = calculateLine(bsdStyle, rel_path, checksum)
 
-					// Emit line
+					// Emit the calculated line.
 					i = i + emitLine(xxhsumFilepath, line, verbose)
 				}
 			}
@@ -83,9 +83,11 @@ func calculateLine(bsdStyle bool, relPath string, checksum string) string {
 
 // Outputs a line.
 func emitLine(xxhsumFilepath string, line string, verbose bool) (linesEmitted int) {
+	// Emit to conslole.
 	if verbose {
 		fmt.Print(line)
 	}
+	// Emit to file, appending the `line`.
 	if err := appendToFile(xxhsumFilepath, line); err != nil {
 		log.Printf("error appending to file %s; skipping %v\n", xxhsumFilepath, err)
 	} else {
