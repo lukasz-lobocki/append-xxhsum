@@ -3,33 +3,39 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+# Last segment of current path
+modulename=${PWD##*/}
+modulename=${modulename:-/}  # to correct for the case where PWD=/
+
+if [[ -f ./cmd/"${modulename}.go" ]]; then
+  :
+else
+  echo "No file ${modulename}.go found."
+  exit
+fi
+
 # List architectures to build
 goarchs=('amd64' 'arm64')
 
-# Go to source directory
-pushd ~/Code/golang/append-xxhsum/cmd > /dev/null || exit
-
 for i in "${goarchs[@]}"; do
   export GOARCH=${i}
-  rm ../bin/append-xxhsum-"${GOARCH}"
+  rm --force ./bin/"${modulename}"-"${GOARCH}"
   go build \
     -ldflags="-X 'main.version=$(git describe --abbrev=0 --tags)+${GOARCH}.$(git rev-parse --short HEAD)' \
       -s -w" \
-    -o ../bin/append-xxhsum-"${GOARCH}" \
-  .
+    -o ./bin/"${modulename}"-"${GOARCH}" \
+  ./cmd
 
   # Display the result's characteristics
-  file ../bin/append-xxhsum-"${GOARCH}"
+  file ./bin/"${modulename}"-"${GOARCH}"
 
 done
 
-# For your local architecture, create default file without architecture name
-cp ../bin/append-xxhsum-"$(dpkg --print-architecture)" ../bin/append-xxhsum
+# For your local architecture, create default file without architecture name suffix
+cp ./bin/"${modulename}"-"$(dpkg --print-architecture)" ./bin/"${modulename}"
 
 # Local copy to directory of executables
-sudo cp ../bin/append-xxhsum /usr/local/bin/append-xxhsum
+sudo cp ./bin/"${modulename}" /usr/local/bin/"${modulename}"
 
 # Remote copy arm64 build to nextcloudpi
-scp ../bin/append-xxhsum-arm64 la_lukasz@nextcloudpi.local:./tmp/append-xxhsum
-
-popd > /dev/null || exit
+scp ./bin/"${modulename}"-arm64 la_lukasz@nextcloudpi.local:./tmp/"${modulename}"
