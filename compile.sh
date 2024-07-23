@@ -37,5 +37,5 @@ cp ./bin/"${modulename}"-"$(dpkg --print-architecture)" ./bin/"${modulename}"
 # Local copy to directory of executables
 sudo cp ./bin/"${modulename}" /usr/local/bin/"${modulename}"
 
-# Remote copy arm64 build to nextcloudpi
-scp ./bin/"${modulename}"-arm64 la_lukasz@nextcloudpi.local:./tmp/"${modulename}"
+# Remote copy amd64 build to nuc11atk
+scp ./bin/"${modulename}"-amd64 la_lukasz@nuc11atk.lan:./tmp/"${modulename}"
